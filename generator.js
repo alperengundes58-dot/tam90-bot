@@ -129,7 +129,23 @@ async function createTamDoksanPost(bgImagePath, whiteText, yellowText, outputPat
   fs.writeFileSync(tempHtml, htmlContent, 'utf-8');
 
   let rendered = false;
-  if (puppeteer) {
+
+  // Windows'ta doğrudan kurulu olan Edge'i kullan (0.3 saniyede basar)
+  const isWindows = process.platform === 'win32';
+  const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+
+  if (isWindows && fs.existsSync(edgePath)) {
+    try {
+      const cmd = `"${edgePath}" --headless --disable-gpu --screenshot="${normalizedOut}" --window-size=825,1024 "file:///${tempHtml.replace(/\\/g, '/')}"`;
+      execSync(cmd, { stdio: 'ignore' });
+      rendered = true;
+    } catch (e) {
+      console.log('Edge render hatası:', e.message);
+    }
+  }
+
+  // Linux (Render) ortamında Puppeteer kullan
+  if (!rendered && puppeteer) {
     try {
       const browser = await puppeteer.launch({
         headless: 'new',
@@ -142,16 +158,7 @@ async function createTamDoksanPost(bgImagePath, whiteText, yellowText, outputPat
       await browser.close();
       rendered = true;
     } catch (e) {
-      console.log('Puppeteer fallback yapılıyor:', e.message);
-    }
-  }
-
-  if (!rendered) {
-    const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
-    if (fs.existsSync(edgePath)) {
-      const cmd = `"${edgePath}" --headless --disable-gpu --screenshot="${normalizedOut}" --window-size=825,1024 "file:///${tempHtml.replace(/\\/g, '/')}"`;
-      execSync(cmd, { stdio: 'ignore' });
-      rendered = true;
+      console.log('Puppeteer hatası:', e.message);
     }
   }
 
