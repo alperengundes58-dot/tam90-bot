@@ -26,13 +26,12 @@ def log(msg):
     if len(LOG_MESSAGES) > 60:
         LOG_MESSAGES.pop(0)
 
-# 2. Render Kalıcı Hafıza (Env-Vars) Entegrasyonu
+# 2. Render Kalıcı Hafıza Entegrasyonu
 RENDER_API_KEY = os.environ.get("RENDER_API_KEY", "rnd_Io3TxMKKFNfiToforho4hmTXR5YN")
 RENDER_SERVICE_ID = os.environ.get("RENDER_SERVICE_ID", "srv-dbd88oafngtc73fv6n70")
 SESSION_FILE = Path(__file__).parent / "session.json"
 
 def persist_session_to_cloud():
-    """Oturumu Render'ın kalıcı çevre değişkenlerine yazar (Container silinse de kaybolmaz)"""
     if not SESSION_FILE.exists():
         return
     try:
@@ -48,12 +47,11 @@ def persist_session_to_cloud():
             timeout=10
         )
         if r.status_code in [200, 201]:
-            log("🔒 Oturum Render kalıcı hafızasına başarıyla yedeklendi! (Deploylarda silinmez)")
+            log("🔒 Oturum Render kalıcı hafızasında güncellendi.")
     except Exception as e:
         log(f"Render kalıcı kayıt hatası: {e}")
 
 def restore_session_from_cloud():
-    """Render kalıcı hafızasından oturumu geri yükler"""
     env_data = os.environ.get("IG_SESSION_DATA")
     if env_data and not SESSION_FILE.exists():
         try:
@@ -77,16 +75,6 @@ class HealthHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Content-type", "application/json; charset=utf-8")
             self.end_headers()
             self.wfile.write(json.dumps(LOG_MESSAGES, ensure_ascii=False, indent=2).encode("utf-8"))
-            return
-
-        if parsed.path == '/session':
-            self.send_response(200)
-            self.send_header("Content-type", "application/json; charset=utf-8")
-            self.end_headers()
-            if SESSION_FILE.exists():
-                self.wfile.write(SESSION_FILE.read_bytes())
-            else:
-                self.wfile.write(b"{}")
             return
 
         if parsed.path in ['/post-now', '/api/post-now']:
@@ -133,7 +121,7 @@ def login_instagram(two_factor_code=None):
 
     try:
         if two_factor_code:
-            log(f"2FA Kodu ({two_factor_code}) ile giriş yapılıyor...")
+            log(f"2FA Kodu ile giriş yapılıyor...")
             cl.login(IG_USERNAME, IG_PASSWORD, verification_code=two_factor_code)
         else:
             cl.login(IG_USERNAME, IG_PASSWORD)
@@ -191,7 +179,7 @@ def get_live_headline_and_photo():
 
     return "Barış Alper Yılmaz İçin Avrupa Devi Devrede!", "https://iftm.tmgrup.com.tr/2025/05/31/baris-alper-yilmazin-babasindan-flas-transfer-aciklamasi-1748678696062.jpg"
 
-# 6. Akıllı Türkçe Futbol Manşet Formatlayıcı (YARIM YAMALAK KALMAZ, ASLA TAŞMAZ)
+# 6. Vurucu Manşet Formatlayıcı (2 Satır, Net, Tok ve Büyük)
 def format_football_headline(title):
     clean = re.sub(r'^(FLAŞ|SON DAKİKA|ÖZEL HABER|ÖZEL|HABER|TRANSFER|RESMİ AÇIKLAMA|RESMİ)\s*[:|-]\s*', '', title, flags=re.I).strip()
     clean = clean.replace('"', '').replace("'", "").replace("’", "").replace("“", "").replace("”", "").strip()
@@ -199,63 +187,64 @@ def format_football_headline(title):
 
     words = clean.split()
     
-    # Çok uzun RSS başlıklarını en vurucu 6-8 kelimeye anlam bütünlüğüyle indir
-    if len(words) > 8:
-        # Sonundaki 'kaldı', 'oldu', 'açıkladı' gibi yüklemi korumak için ilk ve son kısımları dengeli bağla
-        selected = words[:7]
-        words = selected
+    # 5-6 kelimelik vurucu manşet seç
+    if len(words) > 6:
+        selected = words[:6]
+    else:
+        selected = words
 
-    mid = max(1, len(words) // 2)
-    line1 = " ".join(words[:mid]).upper()
-    line2 = (" ".join(words[mid:]) + " !").upper()
+    mid = max(1, len(selected) // 2)
+    line1 = " ".join(selected[:mid]).upper()
+    line2 = (" ".join(selected[mid:]) + " !").upper()
 
     return line1, line2
 
-# 7. 1080x1350 Ultra HD Tam Doksan Orijinal Tasarım Motoru
+# 7. 1080x1350 Tam Doksan Orijinal Tasarım Motoru (BÜYÜK YAZI, SIFIR BOŞLUK)
 def generate_tam90_post(raw_image_path, title, output_path):
     canvas_w, canvas_h = 1080, 1350
+    footer_h = 196
+    target_photo_h = canvas_h - footer_h  # 1154px (Sıfır siyah boşluk, tam doluluk!)
+
     canvas = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 255))
 
-    # 1. Gerçek Basın Fotoğrafı
+    # 1. Gerçek Basın Fotoğrafı (Tam doluluk ile)
     raw_img = Image.open(raw_image_path).convert("RGBA")
     
-    # Ultra HD Keskinlik ve Canlılık
     enhancer = ImageEnhance.Sharpness(raw_img)
     raw_img = enhancer.enhance(1.25)
     color_enhancer = ImageEnhance.Color(raw_img)
     raw_img = color_enhancer.enhance(1.08)
 
-    target_h = 960
     img_ratio = raw_img.width / raw_img.height
-    target_ratio = canvas_w / target_h
+    target_ratio = canvas_w / target_photo_h
 
     if img_ratio > target_ratio:
-        scale_h = target_h
-        scale_w = int(target_h * img_ratio)
+        scale_h = target_photo_h
+        scale_w = int(target_photo_h * img_ratio)
     else:
         scale_w = canvas_w
         scale_h = int(canvas_w / img_ratio)
 
     resized_photo = raw_img.resize((scale_w, scale_h), Image.Resampling.LANCZOS)
     left = (scale_w - canvas_w) // 2
-    top = (scale_h - target_h) // 2
-    cropped_photo = resized_photo.crop((left, top, left + canvas_w, top + target_h))
+    top = (scale_h - target_photo_h) // 2
+    cropped_photo = resized_photo.crop((left, top, left + canvas_w, top + target_photo_h))
     canvas.paste(cropped_photo, (0, 0))
 
-    # Alt Yumuşak Degrade
-    gradient_h = 450
+    # Alt Kısma Yumuşak Karartma Degradesi (Yazının net okunması için)
+    gradient_h = 550
+    gradient_y = target_photo_h - gradient_h
     gradient = Image.new('L', (canvas_w, gradient_h))
     for y in range(gradient_h):
-        alpha = int(255 * (y / gradient_h) ** 1.6)
+        alpha = int(255 * (y / gradient_h) ** 1.5)
         for x in range(canvas_w):
             gradient.putpixel((x, y), alpha)
     black_layer = Image.new('RGBA', (canvas_w, gradient_h), (0, 0, 0, 255))
-    canvas.paste(black_layer, (0, 510), gradient)
+    canvas.paste(black_layer, (0, gradient_y), gradient)
 
     draw = ImageDraw.Draw(canvas)
-    draw.rectangle([0, 960, canvas_w, canvas_h], fill=(0, 0, 0, 255))
 
-    # 2. Sol Üst Şeffaf TAM90 Logosu
+    # 2. Sol Üst TAM90 Logosu
     logo_path = Path(__file__).parent / "templates" / "tam90_logo.png"
     if logo_path.exists():
         logo_img = Image.open(logo_path).convert("RGBA")
@@ -264,29 +253,44 @@ def generate_tam90_post(raw_image_path, title, output_path):
         logo_resized = logo_img.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
         canvas.paste(logo_resized, (30, 30), logo_resized)
 
-    # 3. Alt Sponsorlar Barı (AYDESSA + SOSYAL MEDYA İKONLARI + LUSTER CAR - SES BUTONSUZ)
+    # 3. Alt Sponsorlar Barı (AYDESSA + SOSYAL MEDYA + LUSTER CAR - SES BUTONSUZ)
     footer_path = Path(__file__).parent / "templates" / "sponsors_footer.png"
     if footer_path.exists():
         footer_img = Image.open(footer_path).convert("RGBA")
-        footer_h = 196
         footer_resized = footer_img.resize((canvas_w, footer_h), Image.Resampling.LANCZOS)
         canvas.paste(footer_resized, (0, canvas_h - footer_h), footer_resized)
 
-    # 4. Spor Tipografisi (Oswald Bold / DejaVu - İki Satır, Okunaklı, Tok)
+    # 4. DEVASA, KALIN SPOR MANŞETİ (Impact / Arial Bold - 100px - 120px Arası!)
     line1, line2 = format_football_headline(title)
 
-    font_path = Path(__file__).parent / "templates" / "Oswald-Bold.ttf"
-    font_size = 76
+    font_candidates = [
+        Path(__file__).parent / "templates" / "headline.ttf",
+        Path(__file__).parent / "templates" / "arialbd.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    ]
+    
+    font_file = None
+    for cand in font_candidates:
+        if isinstance(cand, Path) and cand.exists() and cand.stat().st_size > 1000:
+            font_file = str(cand)
+            break
+        elif isinstance(cand, str) and os.path.exists(cand):
+            font_file = cand
+            break
+
+    # 110px'den başlat, genişliğe sığana kadar hafifçe küçült (asla 70px altına inmez)
+    font_size = 110
     font = None
 
-    while font_size >= 40:
+    while font_size >= 65:
         try:
-            if font_path.exists():
-                font = ImageFont.truetype(str(font_path), font_size)
+            if font_file:
+                font = ImageFont.truetype(font_file, font_size)
             else:
-                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size)
-        except:
-            font = ImageFont.load_default()
+                font = ImageFont.load_default()
+                break
+        except Exception as fe:
+            log(f"Font yükleme uyarısı: {fe}")
             break
 
         b1 = draw.textbbox((0, 0), line1, font=font)
@@ -294,47 +298,52 @@ def generate_tam90_post(raw_image_path, title, output_path):
         w1 = b1[2] - b1[0]
         w2 = b2[2] - b2[0]
 
-        if max(w1, w2) <= 980:
+        if max(w1, w2) <= 1000:
             break
         font_size -= 4
 
-    y_pos = 890
+    log(f"Kullanılan Manşet Font Boyutu: {font_size}px (Vurucu & Devasa)")
+
+    # İki satırı alt sponsor barının hemen üstüne yerleştir
+    bbox1 = draw.textbbox((0, 0), line1, font=font)
+    bbox2 = draw.textbbox((0, 0), line2, font=font)
+    h1 = bbox1[3] - bbox1[1]
+    h2 = bbox2[3] - bbox2[1]
+    line_gap = 18
+    total_text_h = h1 + h2 + line_gap
+
+    # Footer'ın 30px üstünde bitsin
+    y_start = (canvas_h - footer_h - 35) - total_text_h
+    curr_y = y_start
+
     for line, color in [(line1, (255, 255, 255)), (line2, (255, 204, 0))]:
         bbox = draw.textbbox((0, 0), line, font=font)
         text_w = bbox[2] - bbox[0]
         text_h = bbox[3] - bbox[1]
         x_pos = (canvas_w - text_w) // 2
 
-        # 4px kalın tok siyah dış kontur (kontrast ve derinlik)
-        for ox in range(-4, 5):
-            for oy in range(-4, 5):
-                draw.text((x_pos + ox, y_pos + oy), line, font=font, fill=(0, 0, 0, 255))
+        # 5px Kalın Siyah Dış Hat (Kontrastı zirveye taşır)
+        for ox in range(-5, 6):
+            for oy in range(-5, 6):
+                draw.text((x_pos + ox, curr_y + oy), line, font=font, fill=(0, 0, 0, 255))
 
-        draw.text((x_pos, y_pos), line, font=font, fill=color)
-        y_pos += text_h + 16
+        draw.text((x_pos, curr_y), line, font=font, fill=color)
+        curr_y += text_h + line_gap
 
     final_rgb = canvas.convert("RGB")
     final_rgb.save(output_path, "JPEG", quality=98)
     log(f"1080x1350 Ultra HD Tam Doksan görseli hazırlandı: {output_path}")
 
-# 8. Futbol Sayfasına Özel Viral Müzik Seçici (Sırlar Dünyası vb. ASLA ÇIKMAZ)
+# 8. Futbol Sayfasına Özel Viral Müzik
 def get_viral_football_track():
-    # Futbol reels/postlarında tutan enerji dolu drill, phonk ve stadyum ritimleri
-    queries = [
-        "drill beat",
-        "turkce drill",
-        "football phonk",
-        "stadium anthem",
-        "hype drill",
-        "bass phonk"
-    ]
+    queries = ["drill beat", "turkce drill", "football phonk", "stadium anthem", "hype drill"]
     query = random.choice(queries)
     try:
         log(f"Futbol için viral müzik taranıyor: '{query}'...")
-        tracks = cl.search_music(query=query)
+        tracks = cl.search_music(query)
         if tracks and len(tracks) > 0:
             track = random.choice(tracks)
-            log(f"🔥 Seçilen kaliteli futbol müziği: '{track.title}' - {track.subtitle}")
+            log(f"🔥 Seçilen futbol müziği: '{track.title}' - {track.subtitle}")
             return track
     except Exception as e:
         log(f"Müzik arama uyarısı: {e}")
@@ -384,7 +393,7 @@ def execute_post(two_factor_code=None):
         except Exception as music_err:
             log(f"Müzikli yükleme atlandı ({music_err}), standart HD yüklemeye geçiliyor...")
 
-        # 2. Standart HD Yükleme Fallback
+        # 2. Standart HD Yükleme
         if not uploaded:
             try:
                 log("Fotoğraf Instagram'a yükleniyor...")
