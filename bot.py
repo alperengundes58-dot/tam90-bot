@@ -179,23 +179,55 @@ def get_live_headline_and_photo():
 
     return "Barış Alper Yılmaz İçin Avrupa Devi Devrede!", "https://iftm.tmgrup.com.tr/2025/05/31/baris-alper-yilmazin-babasindan-flas-transfer-aciklamasi-1748678696062.jpg"
 
-# 6. Tam ve Eksiksiz Manşet Formatlayıcı (ASLA CÜMLE KESİLMEZ, TÜM HABER YAZILIR)
+# 6. Kısa, Net ve Vurucu Manşet Motoru (YeniAçık Tarzı - 2-4 Kelime, Devasa Boyut)
 def format_football_headline(title):
     clean = re.sub(r'^(FLAŞ|SON DAKİKA|ÖZEL HABER|ÖZEL|HABER|TRANSFER|RESMİ AÇIKLAMA|RESMİ)\s*[:|-]\s*', '', title, flags=re.I).strip()
     clean = clean.replace('"', '').replace("'", "").replace("’", "").replace("“", "").replace("”", "").strip()
     clean = clean.rstrip('.!')
+    lower = clean.lower()
 
+    # 1. Maç & Beraberlik & Düello
+    if any(k in lower for k in ["berabere", "düello", "yenişemedi", "crystal palace"]):
+        if "beşiktaş" in lower:
+            return "BEŞİKTAŞ'TAN", "MÜTHİŞ DÜELLO !"
+        elif "fenerbahçe" in lower:
+            return "FENERBAHÇE'DEN", "MÜTHİŞ DÜELLO !"
+        elif "galatasaray" in lower:
+            return "GALATASARAY'DAN", "MÜTHİŞ DÜELLO !"
+        return "GOL DÜELLOSU", "KAZANAN ÇIKMADI !"
+
+    # 2. Galibiyet & Zafer
+    if any(k in lower for k in ["galip", "kazandı", "yendi", "mağlup etti", "zafer"]):
+        if "beşiktaş" in lower:
+            return "BEŞİKTAŞ", "FARKLI KAZANDI !"
+        elif "fenerbahçe" in lower:
+            return "FENERBAHÇE", "FARKLI KAZANDI !"
+        elif "galatasaray" in lower:
+            return "GALATASARAY", "FARKLI KAZANDI !"
+        return "MÜTHİŞ ZAFER", "KAZANMAYI BİLDİ !"
+
+    # 3. Transfer & Anlaşma
+    if any(k in lower for k in ["transfer", "devrede", "anlaştı", "imza", "avrupa"]):
+        words = clean.split()
+        if len(words) >= 2:
+            return f"{words[0]} {words[1]}".upper(), "AVRUPA DEVİ DEVREDE !"
+        return "FLAŞ TRANSFER", "ANLAŞMA SAĞLANDI !"
+
+    # 4. Kriz & Ayrılık & Şok
+    if any(k in lower for k in ["ayrılık", "istifa", "veda", "kriz"]):
+        return "ORTALIK KARIŞTI", "FLAŞ AYRILIK !"
+
+    if any(k in lower for k in ["sakatlık", "şok", "yıkıldı"]):
+        return "KÖTÜ HABER", "ŞOK SAKATLIK !"
+
+    # 5. Genel Durum: En fazla 3-4 kelime, kısa ve net!
     words = clean.split()
-    
-    # Haberi ASLA yarım kesme! Cümlenin tamamını iki satıra tam dengeli paylaştır
-    mid = len(words) // 2
-    if mid == 0:
-        mid = 1
-        
-    line1 = " ".join(words[:mid]).upper()
-    line2 = (" ".join(words[mid:]) + " !").upper()
-
-    return line1, line2
+    if len(words) <= 2:
+        return words[0].upper(), (words[1] + " !").upper() if len(words) > 1 else "FLAŞ GELİŞME !"
+    elif len(words) <= 4:
+        return f"{words[0]} {words[1]}".upper(), f"{' '.join(words[2:])} !".upper()
+    else:
+        return f"{words[0]} {words[1]}".upper(), f"{words[2]} {words[3]} !".upper()
 
 # 7. 1080x1350 Tam Doksan Orijinal Tasarım Motoru (BÜYÜK YAZI, SIFIR BOŞLUK)
 def generate_tam90_post(raw_image_path, title, output_path):
@@ -276,11 +308,11 @@ def generate_tam90_post(raw_image_path, title, output_path):
             font_file = cand
             break
 
-    # 110px'den başlat, genişliğe tam sığana kadar küçült (asla taşmaz)
-    font_size = 110
+    # 135px'den başlat (YeniAçık gibi devasa, net, vurucu!), genişliğe tam sığana kadar küçült
+    font_size = 135
     font = None
 
-    while font_size >= 48:
+    while font_size >= 60:
         try:
             if font_file:
                 font = ImageFont.truetype(font_file, font_size)
@@ -296,7 +328,7 @@ def generate_tam90_post(raw_image_path, title, output_path):
         w1 = b1[2] - b1[0]
         w2 = b2[2] - b2[0]
 
-        if max(w1, w2) <= 1000:
+        if max(w1, w2) <= 980:
             break
         font_size -= 2
 
