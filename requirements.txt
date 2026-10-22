@@ -1,0 +1,6 @@
+instagrapi==2.1.2
+requests
+pillow
+feedparser
+beautifulsoup4
+schedule
