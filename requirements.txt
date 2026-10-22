@@ -1,6 +1,5 @@
-instagrapi==2.1.2
+instagrapi>=3.1.0
 requests
 pillow
 feedparser
 beautifulsoup4
-schedule
