@@ -5,34 +5,57 @@ const http = require('http');
 const { getLatestFootballNews } = require('./news_scraper');
 const { createTamDoksanPost } = require('./generator');
 const { uploadPhoto } = require('./uploader');
+const { publishLineupStory } = require('./story_lineup');
 require('dotenv').config();
 
 // Bulut ortamında çerezleri ortam değişkeninden geri yükle
 if (process.env.IG_COOKIES_JSON && !fs.existsSync(path.join(__dirname, 'cookies.json'))) {
   fs.writeFileSync(path.join(__dirname, 'cookies.json'), process.env.IG_COOKIES_JSON);
-  console.log('[Bulut] Oturum çerezleri IG_COOKIES_JSON değişkeninden yüklendi.');
+  console.log('[Bulut] Oturum çerezleri yüklendi.');
 }
 
-// Web Sunucusu (Render.com / Bulut 7/24 Kesintisiz Çalışma İçin)
+// 7/24 Web Sunucusu (Render için)
 const PORT = process.env.PORT || 3000;
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-  res.end('⚽️ TAM DOKSAN (@tamdoksanaresmi) 7/24 Orijinal Şablonlu Futbol Botu Aktif!\n\nSponsorlar: Aydessa Lingerie & Luster Car\nKaynaklar: Transfermarkt, Fotomaç, Fanatik, NTV Spor, Sports Digitale, Yağız Sabuncuoğlu');
+  res.end('⚽️ TAM DOKSAN (@tamdoksanaresmi) 7/24 VİRAL BÜYÜME VE SPONSOR ÇEKME MOTORU AKTİF!\n\nGünlük Paylaşım Saatleri: 10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00 (Günde 7 Gönderi)\nMaç Günleri: Sınırsız Ekstra Paylaşım ve Story Modu Aktif.');
 }).listen(PORT, () => {
-  console.log(`[Bulut] Web sunucusu ${PORT} portunda 7/24 yayında.`);
+  console.log(`[Bulut] Web sunucusu ${PORT} portunda 7/24 canlı yayında.`);
 });
 
 console.log('================================================================');
-console.log('⚽️ TAM DOKSAN (@tamdoksanaresmi) RESMİ ŞABLON BOTU BAŞLATILDI');
-console.log('💎 Sponsorlar: Aydessa Lingerie & Luster Car (Her görselde altlık)');
-console.log('🏷️ Logo: Sol Üst TAM90 Futbol\'a Tutku');
-console.log('📸 Görseller: %100 GERÇEK BASIN VE MAÇ FOTOĞRAFLARI (Yapay Zeka Çizimi Yok)');
-console.log('🕒 Günlük Post Saatleri: 10:00, 15:00, 20:00');
+console.log('🔥 TAM DOKSAN (@tamdoksanaresmi) VİRAL ETKİLEŞİM MODU DEVREDE');
+console.log('🎯 Hedef: Yorum rekorları, keşfete düşme ve sponsor çekme');
+console.log('🕒 Günlük Gönderi Saatleri: 10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00');
+console.log('⚽️ Maç Günleri: Sınırsız ekstra gönderi ve İlk 11 Story sistemi');
 console.log('================================================================\n');
 
-// Başlığı İki Satıra Bölme (1. Satır Beyaz, 2. Satır Sarı)
+// Yüksek Yorum ve Etkileşim Çeken Kanca Şablonları (Instagram Algoritması İçin)
+const ENGAGEMENT_HOOKS = [
+  {
+    type: 'tartisma',
+    question: '👉 Sizce kim haklı? Tarafsız gözle yorumlarınızı yazın, tartışalım! 👇',
+    callToAction: 'Tarafını seç ve fikrini belirt! Yorumlardayız.'
+  },
+  {
+    type: 'transfer_anket',
+    question: '🔥 Bu transfer gerçekleşirse Süper Lig\'in kaderi değişir mi? Evet / Hayır?',
+    callToAction: 'Takımına bu oyuncu gelse sevinir miydin? Yorumlara yaz!'
+  },
+  {
+    type: 'hakem_var',
+    question: '👀 Sizce bu pozisyonda hakemin ve VAR\'ın kararı doğru mu? Yorumlarda buluşalım! 👇',
+    callToAction: 'Pozisyonu 1 ile 10 arasında puanlayın!'
+  },
+  {
+    type: 'nostalji_karsilastirma',
+    question: '⚔️ Prime dönemlerini kıyaslarsak hangisi takımında banko oynar? A mı B mi?',
+    callToAction: 'Geceye damga vuracak cevabını yoruma bırak!'
+  }
+];
+
+// Başlığı İki Satıra Bölme (1. Satır Beyaz, 2. Satır Sarı ve Sansasyonel)
 function splitHeadline(title) {
-  // Temizle
   let clean = title.replace(/^(FLAŞ|SON DAKİKA|ÖZEL|HABER|TRANSFER|RESMİ)\s*[:|-]\s*/i, '').trim();
   const words = clean.split(' ');
 
@@ -50,11 +73,11 @@ function splitHeadline(title) {
   };
 }
 
-// Canlı Haberi Gerçek Basın Fotoğrafıyla Tam Doksan Şablonuna Giydirip Paylaşma
-async function publishTamDoksanSlot(slotName) {
-  console.log(`\n-----------------------------------------------------`);
-  console.log(`[${new Date().toLocaleTimeString('tr-TR')}] ⚽️ ${slotName} GÖNDERİSİ HAZIRLANIYOR...`);
-  console.log(`-----------------------------------------------------`);
+// Viral Post Yayınlama Motoru
+async function publishViralPost(slotName) {
+  console.log(`\n======================================================`);
+  console.log(`[${new Date().toLocaleTimeString('tr-TR')}] 🔥 ${slotName} VİRAL GÖNDERİSİ HAZIRLANIYOR...`);
+  console.log(`======================================================`);
 
   try {
     const liveNews = await getLatestFootballNews();
@@ -63,7 +86,7 @@ async function publishTamDoksanSlot(slotName) {
       return;
     }
 
-    const item = liveNews[Math.floor(Math.random() * Math.min(liveNews.length, 6))];
+    const item = liveNews[Math.floor(Math.random() * Math.min(liveNews.length, 8))];
     console.log(`[Haber Seçildi]: ${item.title}`);
 
     // Gerçek fotoğrafı haberden çek
@@ -72,43 +95,40 @@ async function publishTamDoksanSlot(slotName) {
       const pageRes = await axios.get(item.link, { timeout: 10000 });
       const match = pageRes.data.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
       if (match) realPhotoUrl = match[1];
-    } catch (e) {
-      console.log('Haber sayfasından görsel çekilemedi, yedek kullanılıyor.');
-    }
+    } catch (e) {}
 
-    // Fotoğrafı indir
     const tempPressPhoto = path.join(__dirname, 'temp_raw_press.jpg');
     if (realPhotoUrl) {
       const dlRes = await axios.get(realPhotoUrl, { responseType: 'arraybuffer' });
       fs.writeFileSync(tempPressPhoto, dlRes.data);
     } else {
-      // Eğer çekilemezse mevcut en son basın fotoğrafını kullan
       fs.copyFileSync(path.join(__dirname, 'images', 'real_press_photo.jpg'), tempPressPhoto);
     }
 
-    // Başlıkları ayarla
     const { white, yellow } = splitHeadline(item.title);
-
-    // Orijinal Tam Doksan Şablonunu Oluştur
     const finalPostPath = path.join(__dirname, 'temp_final_tam90_post.jpg');
-    createTamDoksanPost(tempPressPhoto, white, yellow, finalPostPath);
+    await createTamDoksanPost(tempPressPhoto, white, yellow, finalPostPath);
 
-    // Instagram Açıklaması
+    const hook = ENGAGEMENT_HOOKS[Math.floor(Math.random() * ENGAGEMENT_HOOKS.length)];
+
+    // Maksimum Yorum Çekecek Instagram Açıklaması
     const caption = `🚨 ${item.title}\n\n` +
-      `Süper Lig'de ve Avrupa'da sıcak gelişmeler devam ediyor. Detaylar geldikçe aktaracağız.\n\n` +
-      `Sizce bu gelişme nasıl sonuçlanır? Yorumlarda buluşalım! 👇⚽️\n.\n.\n` +
-      `#tamdoksan #futbol #süperlig #fenerbahçe #galatasaray #beşiktaş #trabzonspor #transfer #haber #sportsdigitale`;
+      `Süper Lig'de ve Avrupa arenasında tansiyon hiç düşmüyor! Masadaki son detaylar ve perde arkasında konuşulanlar ortaya çıktı.\n\n` +
+      `${hook.question}\n\n` +
+      `💬 ${hook.callToAction}\n` +
+      `👉 Takip etmeyi ve bildirimleri açmayı unutmayın: @tamdoksanaresmi\n.\n.\n` +
+      `#tamdoksan #futbol #süperlig #fenerbahçe #galatasaray #beşiktaş #trabzonspor #transfer #haber #keşfet #futbolcaps #derbi`;
 
-    // Instagram'a Paylaş
-    console.log('[Instagram] Tam Doksan şablonlu gönderi paylaşılıyor...');
+    console.log('[Instagram] Viral Tam Doksan gönderisi sayfaya yükleniyor...');
     await uploadPhoto(finalPostPath, caption);
   } catch (err) {
     console.error('[Hata] Paylaşım yapılamadı:', err.message);
   }
 }
 
-// 7/24 Zamanlayıcı Döngüsü (10:00, 15:00, 20:00)
-const postedToday = new Set();
+// 7/24 Kesintisiz Zamanlayıcı (10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00)
+const postedSlots = new Set();
+const TARGET_HOURS = [10, 12, 15, 17, 20, 22, 0];
 
 setInterval(async () => {
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
@@ -116,22 +136,17 @@ setInterval(async () => {
   const minute = now.getMinutes();
   const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
 
-  if (hour === 10 && minute === 0 && !postedToday.has(`${todayKey}_10`)) {
-    postedToday.add(`${todayKey}_10`);
-    await publishTamDoksanSlot('SABAH GÜNDEMİ');
+  for (const targetHour of TARGET_HOURS) {
+    const slotKey = `${todayKey}_slot_${targetHour}`;
+
+    if (hour === targetHour && minute === 0 && !postedSlots.has(slotKey)) {
+      postedSlots.add(slotKey);
+      await publishViralPost(`SAAT ${targetHour}:00 GÜNDEMİ`);
+    }
   }
 
-  if (hour === 15 && minute === 0 && !postedToday.has(`${todayKey}_15`)) {
-    postedToday.add(`${todayKey}_15`);
-    await publishTamDoksanSlot('ÖĞLE GÜNDEMİ');
-  }
-
-  if (hour === 20 && minute === 0 && !postedToday.has(`${todayKey}_20`)) {
-    postedToday.add(`${todayKey}_20`);
-    await publishTamDoksanSlot('AKŞAM GÜNDEMİ');
-  }
-
-  if (hour === 0 && minute === 1) {
-    postedToday.clear();
+  // Gece yarısı hafızayı tazele
+  if (hour === 0 && minute === 5) {
+    postedSlots.clear();
   }
 }, 30000);
