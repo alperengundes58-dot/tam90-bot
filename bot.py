@@ -179,7 +179,7 @@ def get_live_headline_and_photo():
 
     return "Barış Alper Yılmaz İçin Avrupa Devi Devrede!", "https://iftm.tmgrup.com.tr/2025/05/31/baris-alper-yilmazin-babasindan-flas-transfer-aciklamasi-1748678696062.jpg"
 
-# 6. Vurucu Manşet Formatlayıcı (2 Satır, Net, Tok ve Büyük)
+# 6. Tam ve Eksiksiz Manşet Formatlayıcı (ASLA CÜMLE KESİLMEZ, TÜM HABER YAZILIR)
 def format_football_headline(title):
     clean = re.sub(r'^(FLAŞ|SON DAKİKA|ÖZEL HABER|ÖZEL|HABER|TRANSFER|RESMİ AÇIKLAMA|RESMİ)\s*[:|-]\s*', '', title, flags=re.I).strip()
     clean = clean.replace('"', '').replace("'", "").replace("’", "").replace("“", "").replace("”", "").strip()
@@ -187,15 +187,13 @@ def format_football_headline(title):
 
     words = clean.split()
     
-    # 5-6 kelimelik vurucu manşet seç
-    if len(words) > 6:
-        selected = words[:6]
-    else:
-        selected = words
-
-    mid = max(1, len(selected) // 2)
-    line1 = " ".join(selected[:mid]).upper()
-    line2 = (" ".join(selected[mid:]) + " !").upper()
+    # Haberi ASLA yarım kesme! Cümlenin tamamını iki satıra tam dengeli paylaştır
+    mid = len(words) // 2
+    if mid == 0:
+        mid = 1
+        
+    line1 = " ".join(words[:mid]).upper()
+    line2 = (" ".join(words[mid:]) + " !").upper()
 
     return line1, line2
 
@@ -278,11 +276,11 @@ def generate_tam90_post(raw_image_path, title, output_path):
             font_file = cand
             break
 
-    # 110px'den başlat, genişliğe sığana kadar hafifçe küçült (asla 70px altına inmez)
+    # 110px'den başlat, genişliğe tam sığana kadar küçült (asla taşmaz)
     font_size = 110
     font = None
 
-    while font_size >= 65:
+    while font_size >= 48:
         try:
             if font_file:
                 font = ImageFont.truetype(font_file, font_size)
@@ -300,7 +298,7 @@ def generate_tam90_post(raw_image_path, title, output_path):
 
         if max(w1, w2) <= 1000:
             break
-        font_size -= 4
+        font_size -= 2
 
     log(f"Kullanılan Manşet Font Boyutu: {font_size}px (Vurucu & Devasa)")
 
