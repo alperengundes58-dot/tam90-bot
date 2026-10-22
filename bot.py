@@ -294,9 +294,10 @@ def generate_tam90_post(raw_image_path, title, output_path):
     line1, line2 = format_football_headline(title)
 
     font_candidates = [
-        Path(__file__).parent / "templates" / "headline.ttf",
+        Path(__file__).parent / "templates" / "Anton-Regular.ttf",
+        Path(__file__).parent / "templates" / "BebasNeue-Bold.ttf",
         Path(__file__).parent / "templates" / "arialbd.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+        Path(__file__).parent / "templates" / "headline.ttf"
     ]
     
     font_file = None
@@ -334,29 +335,35 @@ def generate_tam90_post(raw_image_path, title, output_path):
 
     log(f"Kullanılan Manşet Font Boyutu: {font_size}px (Vurucu & Devasa)")
 
-    # İki satırı alt sponsor barının hemen üstüne yerleştir
+    # İki satırı alt sponsor barının hemen üstüne yerleştir (sıkı, tok manşet)
     bbox1 = draw.textbbox((0, 0), line1, font=font)
     bbox2 = draw.textbbox((0, 0), line2, font=font)
     h1 = bbox1[3] - bbox1[1]
     h2 = bbox2[3] - bbox2[1]
-    line_gap = 18
+    line_gap = 10
     total_text_h = h1 + h2 + line_gap
 
-    # Footer'ın 30px üstünde bitsin
-    y_start = (canvas_h - footer_h - 35) - total_text_h
+    # Footer'ın 25px üstünde bitsin
+    y_start = (canvas_h - footer_h - 25) - total_text_h
     curr_y = y_start
 
-    for line, color in [(line1, (255, 255, 255)), (line2, (255, 204, 0))]:
+    for line, color in [(line1, (255, 255, 255)), (line2, (255, 210, 0))]:
         bbox = draw.textbbox((0, 0), line, font=font)
         text_w = bbox[2] - bbox[0]
         text_h = bbox[3] - bbox[1]
         x_pos = (canvas_w - text_w) // 2
 
-        # 5px Kalın Siyah Dış Hat (Kontrastı zirveye taşır)
-        for ox in range(-5, 6):
-            for oy in range(-5, 6):
-                draw.text((x_pos + ox, curr_y + oy), line, font=font, fill=(0, 0, 0, 255))
+        # 1. Derin Siyah Düşen Gölge (+6, +8)
+        for sox, soy in [(6, 8), (5, 7), (4, 6)]:
+            draw.text((x_pos + sox, curr_y + soy), line, font=font, fill=(0, 0, 0, 220))
 
+        # 2. 6px Kalın Keskin Siyah Kontur
+        for ox in range(-6, 7):
+            for oy in range(-6, 7):
+                if ox*ox + oy*oy <= 36:
+                    draw.text((x_pos + ox, curr_y + oy), line, font=font, fill=(0, 0, 0, 255))
+
+        # 3. Ana Metin
         draw.text((x_pos, curr_y), line, font=font, fill=color)
         curr_y += text_h + line_gap
 
