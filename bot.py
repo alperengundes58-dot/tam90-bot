@@ -331,7 +331,7 @@ def get_viral_football_track():
     query = random.choice(queries)
     try:
         log(f"Futbol için viral müzik taranıyor: '{query}'...")
-        tracks = cl.search_music(query=query, count=6)
+        tracks = cl.search_music(query=query)
         if tracks and len(tracks) > 0:
             track = random.choice(tracks)
             log(f"🔥 Seçilen kaliteli futbol müziği: '{track.title}' - {track.subtitle}")
