@@ -16,7 +16,15 @@ if (process.env.IG_COOKIES_JSON && !fs.existsSync(path.join(__dirname, 'cookies.
 
 // 7/24 Web Sunucusu (Render için)
 const PORT = process.env.PORT || 3000;
-http.createServer((req, res) => {
+http.createServer(async (req, res) => {
+  if (req.url === '/api/post-now') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ status: 'ok', message: 'Test gönderisi başlatıldı!' }));
+    console.log('[API] Manuel anlık gönderi tetiklendi!');
+    await publishViralPost('MANUEL ANLIK GÖNDERİ');
+    return;
+  }
+
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
   res.end('⚽️ TAM DOKSAN (@tamdoksanaresmi) 7/24 VİRAL BÜYÜME VE SPONSOR ÇEKME MOTORU AKTİF!\n\nGünlük Paylaşım Saatleri: 10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00 (Günde 7 Gönderi)\nMaç Günleri: Sınırsız Ekstra Paylaşım ve Story Modu Aktif.');
 }).listen(PORT, () => {
