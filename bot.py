@@ -20,6 +20,14 @@ PORT = int(os.environ.get("PORT", 3000))
 
 class HealthHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
+        if self.path == '/post-now':
+            self.send_response(200)
+            self.send_header("Content-type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok", "message": "Gönderi anında paylaşılıyor!"}).encode("utf-8"))
+            threading.Thread(target=execute_post).start()
+            return
+
         self.send_response(200)
         self.send_header("Content-type", "text/plain; charset=utf-8")
         self.end_headers()
