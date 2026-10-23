@@ -72,24 +72,24 @@ def get_portal_news_feed():
         return PORTAL_NEWS_CACHE["items"]
 
     sources = [
-        "https://www.sabah.com.tr/rss/futbol.xml",
         "https://www.haberturk.com/rss/spor.xml",
         "https://ajansspor.com/rss",
         "https://www.sabah.com.tr/rss/spor.xml"
     ]
+    skip_keywords = ["voleybol", "hentbol", "güreş", "atletizm", "boks", "tenis"]
     seen = set()
     items = []
 
     for url in sources:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:25]:
+            for entry in feed.entries[:20]:
                 title = clean_html(entry.get("title", ""))
                 summary = clean_html(entry.get("summary", "") or entry.get("description", ""))
                 link = entry.get("link", "")
                 if not title or title in seen:
                     continue
-                if not is_strictly_football(title, summary, link):
+                if any(sk in title.lower() for sk in skip_keywords):
                     continue
 
                 img_url = None
@@ -139,7 +139,7 @@ class HealthHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(news, ensure_ascii=False).encode("utf-8"))
             return
 
-        if parsed.path in ['/templates/tam90_logo.png', '/templates/sponsors_footer.png']:
+        if parsed.path in ['/templates/tam90_profile.png', '/templates/tam90_logo.png', '/templates/sponsors_footer.png']:
             asset_file = Path(__file__).parent / parsed.path.lstrip('/')
             if asset_file.exists():
                 self.send_response(200)
@@ -265,65 +265,23 @@ def clean_html(raw_html):
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
-# %100 SADECE FUTBOL FİLTRESİ (Basketbol, Voleybol, Tenis, F1, Boks vb. Kesinlikle Engellenir)
-NON_FOOTBALL_KEYWORDS = [
-    "basketbol", "euroleague", "nba", "anadolu efes", "efes", "fenerbahçe beko", "beko",
-    "beşiktaş fibabanka", "galatasaray basketbol", "bahçeşehir koleji", "karşıyaka",
-    "tofaş", "türk telekom", "alperen şengün", "ergin ataman", "panathinaikos",
-    "olympiakos", "parkede", "potada", "ribaunt", "üçlük", "smaç", "12 dev adam",
-    "bsl", "tbf", "fiba", "periyot", "çeyrek",
-    "voleybol", "sultanlar ligi", "efeler ligi", "vakıfbank", "eczacıbaşı", "medicana",
-    "daikin", "filenin sultanları", "filenin efeleri", "melissa vargas", "zehra güneş",
-    "ebrar karakurt", "hande baladın", "set ", "sette", "tie-break",
-    "tenis", "wimbledon", "roland garros", "djokovic", "alcaraz", "nadal", "sinner", "zeynep sönmez",
-    "formula 1", "f1", "verstappen", "hamilton", "leclerc", "ferrari", "mclaren", "red bull racing",
-    "motogp", "toprak razgatlıoğlu", "superbike", "ralli",
-    "boks", "ufc", "mma", "güreş", "halter", "atletizm", "yüzme", "okçuluk", "mete gazoz",
-    "cimnastik", "hentbol", "bilardo", "satranç", "espor", "valorant", "counter-strike",
-    "golf", "bisiklet", "snooker", "inşaat", "stadyumu"
-]
-
-FOOTBALL_POSITIVE_KEYWORDS = [
-    "futbol", "süper lig", "galatasaray", "fenerbahçe", "beşiktaş", "trabzonspor",
-    "başakşehir", "samsunspor", "göztepe", "eyüpspor", "kasımpaşa", "sivasspor",
-    "antalyaspor", "alanyaspor", "konyaspor", "rizespor", "gaziantep", "hatayspor",
-    "kayserispor", "bodrum", "adana demirspor", "milli takım", "montella",
-    "arda güler", "kenan yıldız", "hakan çalhanoğlu", "kerem aktürkoğlu", "orkun kökçü",
-    "ferdi kadıoğlu", "barış alper", "icardi", "osimhen", "mourinho", "okan buruk",
-    "sergen yalçın", "şenol güneş", "fatih terim", "ronaldo", "messi", "mbappe", "haaland",
-    "real madrid", "barcelona", "bayern", "münih", "manchester", "liverpool", "arsenal",
-    "chelsea", "juventus", "inter", "milan", "psg", "lille", "benfica", "porto", "atletico",
-    "şampiyonlar ligi", "avrupa ligi", "konferans ligi", "uefa", "fifa", "tff", "pfdk",
-    "mhk", "derbi", "transfer", "bonservis", "forvet", "golcü", "kaleci", "stoper",
-    "orta saha", "teknik direktör", "kırmızı kart", "penaltı", "ofsayt", "var ",
-    "gol", "maç", "puan", "lig", "kupa", "stat", "taraftar", "idman", "antrenman"
-]
-
-def is_strictly_football(title, summary="", link=""):
-    combined = f"{title} {summary} {link}".lower()
-    # 1. Başka spor dalı kelimesi geçiyorsa kesinlikle reddet
-    if any(bad in combined for bad in NON_FOOTBALL_KEYWORDS):
-        return False
-    # 2. En az bir futbol terimi/takımı/oyuncusu geçmeli
-    if not any(good in combined for good in FOOTBALL_POSITIVE_KEYWORDS):
-        return False
-    return True
-
 def get_live_headline_and_photo():
     posted_titles = get_posted_titles()
 
-    # Sadece anlık güncellenen Full HD Türk futbol ve spor kaynakları
+    # Sadece anlık güncellenen Full HD Türk spor kaynakları
     sources = [
-        "https://www.sabah.com.tr/rss/futbol.xml",
         "https://www.haberturk.com/rss/spor.xml",
         "https://ajansspor.com/rss",
         "https://www.sabah.com.tr/rss/spor.xml"
     ]
 
+    # Düşük etkileşimli/amatör/tesis haberlerini filtrele
+    skip_keywords = ["inşaat", "stadyumu", "voleybol", "hentbol", "güreş", "atletizm", "boks", "tenis"]
+
     for url in sources:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:25]:
+            for entry in feed.entries[:18]:
                 title = clean_html(entry.get("title", ""))
                 summary = clean_html(entry.get("summary", "") or entry.get("description", ""))
                 link = entry.get("link", "")
@@ -332,7 +290,8 @@ def get_live_headline_and_photo():
                 if not title or title in posted_titles:
                     continue
 
-                if not is_strictly_football(title, summary, link):
+                lower_t = title.lower()
+                if any(sk in lower_t for sk in skip_keywords):
                     continue
 
                 # 1. Enclosure görseli
