@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TAM 90 | Futbol'a Tutku — Son Dakika Spor & Futbol Haberleri</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&family=Chakra+Petch:ital,wght@0,600;0,700;1,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07080c;
+      --bg-card: #10131c;
+      --bg-card-hover: #171b28;
+      --bg-glass: rgba(16, 19, 28, 0.86);
+      --gold: #FFD400;
+      --gold-dark: #FFA800;
+      --red: #E50914;
+      --text-main: #FFFFFF;
+      --text-muted: #949AB1;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-gold: rgba(255, 212, 0, 0.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 15% 0%, rgba(255, 212, 0, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 85% 10%, rgba(229, 9, 20, 0.06) 0%, transparent 40%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* 1. SON DAKİKA CANLI BANT (TICKER) */
+    .breaking-bar {
+      background: linear-gradient(90deg, #b80000 0%, #e50914 50%, #990000 100%);
+      height: 40px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      position: relative;
+      z-index: 100;
+    }
+
+    .breaking-label {
+      background: var(--gold);
+      color: #000;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 800;
+      font-style: italic;
+      font-size: 13px;
+      letter-spacing: 1px;
+      padding: 0 18px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      box-shadow: 6px 0 18px rgba(0, 0, 0, 0.45);
+      z-index: 2;
+    }
+
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
+      background: #e50914;
+      border-radius: 50%;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.45; }
+      100% { transform: scale(0.95); opacity: 1; }
+    }
+
+    .ticker-wrap {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .ticker-move {
+      display: inline-block;
+      white-space: nowrap;
+      padding-left: 100%;
+      animation: ticker 38s linear infinite;
+    }
+
+    .ticker-move:hover {
+      animation-play-state: paused;
+    }
+
+    .ticker-item {
+      display: inline-block;
+      margin-right: 55px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .ticker-item span.time {
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--gold);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    @keyframes ticker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    /* 2. ÜST NAVBAR & LOGO */
+    .navbar {
+      background: rgba(10, 12, 18, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .nav-container {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+    }
+
+    .brand-logo {
+      height: 54px;
+      width: auto;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+    }
+
+    .brand-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
+    }
+
+    .brand-tagline {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-tagline .title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+    }
+
+    .brand-tagline .sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .search-and-social {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .search-box {
+      position: relative;
+      width: 260px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: #161a26;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 9px 14px 9px 36px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--gold);
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+    }
+
+    .ig-btn {
+      background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(253, 29, 29, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .ig-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* 3. KATEGORİ SEKMELERİ */
+    .category-bar {
+      background: #0c0e15;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .category-container {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .category-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 13px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cat-btn:hover {
+      color: #fff;
+    }
+
+    .cat-btn.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+      background: rgba(255, 212, 0, 0.04);
+    }
+
+    /* 4. ANA İÇERİK DÜZENİ */
+    .main-container {
+      max-width: 1340px;
+      margin: 26px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 28px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+      .search-box {
+        width: 180px;
+      }
+    }
+
+    /* 5. DEV MANŞET VİTRİNİ (HERO SLIDER) */
+    .hero-showcase {
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      position: relative;
+      margin-bottom: 28px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    .hero-slide {
+      position: relative;
+      height: 490px;
+      width: 100%;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .hero-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 15%;
+      transition: transform 0.5s ease;
+      filter: contrast(1.08) saturate(1.12);
+    }
+
+    .hero-slide:hover img {
+      transform: scale(1.03);
+    }
+
+    .hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(7, 8, 12, 0.15) 0%,
+        rgba(7, 8, 12, 0.35) 40%,
+        rgba(7, 8, 12, 0.92) 78%,
+        #07080c 100%
+      );
+    }
+
+    .hero-content {
+      position: absolute;
+      bottom: 68px;
+      left: 32px;
+      right: 32px;
+      z-index: 5;
+    }
+
+    .hero-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .badge-red {
+      background: var(--red);
+      color: #fff;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 4px 11px;
+      border-radius: 5px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .badge-cat {
+      background: rgba(255, 212, 0, 0.16);
+      color: var(--gold);
+      border: 1px solid var(--border-gold);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 5px;
+    }
+
+    .badge-time {
+      color: #cbd5e1;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    /* TAM 90 KAOS STİLİ MANŞET BAŞLIĞI */
+    .hero-title {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.08;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 6px 22px rgba(0, 0, 0, 0.95), 2px 4px 0 #000;
+      margin-bottom: 10px;
+      transform: skewX(-6deg);
+    }
+
+    .hero-title span.highlight {
+      color: var(--gold);
+      display: inline-block;
+    }
+
+    .hero-summary {
+      color: #d1d5db;
+      font-size: 14.5px;
+      max-width: 820px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Manşet Numaralı Geçiş Barı (1 - 5) */
+    .hero-tabs {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      background: rgba(10, 12, 18, 0.94);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      z-index: 10;
+    }
+
+    .hero-tab {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 12.5px;
+      padding: 0 14px;
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      transition: all 0.2s;
+      overflow: hidden;
+    }
+
+    .hero-tab:last-child {
+      border-right: none;
+    }
+
+    .hero-tab .num {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      background: #1c2130;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .hero-tab .tab-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hero-tab.active, .hero-tab:hover {
+      background: rgba(255, 212, 0, 0.08);
+      color: #fff;
+    }
+
+    .hero-tab.active .num {
+      background: var(--gold);
+      color: #000;
+    }
+
+    /* 6. SON DAKİKA HABER KARTLARI IZGARASI */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-transform: uppercase;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 6px;
+      height: 22px;
+      background: var(--gold);
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .refresh-pill {
+      background: #161a26;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+      gap: 20px;
+    }
+
+    .news-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .news-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--border-gold);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-img-wrap {
+      position: relative;
+      height: 185px;
+      overflow: hidden;
+      background: #08090d;
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s ease;
+    }
+
+    .news-card:hover .card-img-wrap img {
+      transform: scale(1.06);
+    }
+
+    .card-cat-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(7, 8, 12, 0.85);
+      backdrop-filter: blur(6px);
+      color: var(--gold);
+      border: 1px solid var(--border-gold);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
+
+    .card-time-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.78);
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .card-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .card-headline {
+      font-weight: 800;
+      font-size: 16px;
+      line-height: 1.35;
+      color: #fff;
+      margin-bottom: 9px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-card:hover .card-headline {
+      color: var(--gold);
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.48;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 14px;
+      flex: 1;
+    }
+
+    .card-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    /* 7. SAĞ SÜTUN (CANLI MAÇLAR + PUAN DURUMU + INSTAGRAM KARTI) */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .widget-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .widget-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    /* Puan Durumu Tablosu */
+    .standings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .standings-table th {
+      text-align: left;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 7px 6px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11.5px;
+    }
+
+    .standings-table td {
+      padding: 9px 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-weight: 600;
+    }
+
+    .standings-table tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .rank-num {
+      display: inline-flex;
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      align-items: center;
+      justify-content: center;
+      font-size: 11.5px;
+      font-weight: 800;
+      background: #1c2130;
+    }
+
+    .rank-1, .rank-2 {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .pts-col {
+      color: var(--gold);
+      font-weight: 800 !important;
+      text-align: right;
+    }
+
+    /* Sponsor & Instagram Banner */
+    .sponsor-banner {
+      background: #000;
+      border: 1px solid var(--border-gold);
+      border-radius: 14px;
+      overflow: hidden;
+      text-align: center;
+      padding: 14px 10px;
+    }
+
+    .sponsor-banner img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+    }
+
+    /* 8. HABER DETAY MODALI */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #10131c;
+      border: 1px solid var(--border-gold);
+      border-radius: 16px;
+      max-width: 760px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .modal-img {
+      width: 100%;
+      max-height: 390px;
+      object-fit: cover;
+    }
+
+    .modal-content {
+      padding: 26px;
+    }
+
+    .modal-title {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: 30px;
+      letter-spacing: 0.6px;
+      line-height: 1.15;
+      color: var(--gold);
+      margin: 10px 0 16px;
+      text-transform: uppercase;
+    }
+
+    .modal-text {
+      color: #e2e8f0;
+      font-size: 15.5px;
+      line-height: 1.7;
+      margin-bottom: 22px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #000;
+      font-weight: 800;
+      font-size: 13.5px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* 9. ALT FOOTER (SPONSOR ŞABLONU İLE) */
+    footer {
+      background: #000;
+      border-top: 1px solid var(--border);
+      margin-top: 50px;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .footer-sponsors-img {
+      max-width: 680px;
+      width: 100%;
+      height: auto;
+      margin: 0 auto 14px;
+      display: block;
+    }
+
+    .footer-copy {
+      color: var(--text-muted);
+      font-size: 12.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. SON DAKİKA CANLI BANT -->
+  <div class="breaking-bar">
+    <div class="breaking-label">
+      <span class="pulse-dot"></span>
+      SON DAKİKA
+    </div>
+    <div class="ticker-wrap">
+      <div class="ticker-move" id="tickerContainer">
+        <span class="ticker-item"><span class="time">CANLI</span> TAM 90 Spor Portalı üzerinden anlık son dakika futbol gelişmeleri yükleniyor...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ÜST NAVBAR -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand-box">
+        <img src="/templates/tam90_logo.png" alt="TAM 90 Logo" class="brand-logo" />
+        <div class="brand-divider"></div>
+        <div class="brand-tagline">
+          <span class="title">SON DAKİKA FUTBOL PORTALI</span>
+          <span class="sub">7/24 Kesintisiz Güncel Spor Haberleri</span>
+        </div>
+      </a>
+
+      <div class="search-and-social">
+        <div class="search-box">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" id="searchInput" placeholder="Takım, oyuncu veya haber ara..." />
+        </div>
+        <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="ig-btn">
+          <span>📸 @tamdoksanaresmi</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. KATEGORİ SEKMELERİ -->
+  <nav class="category-bar">
+    <div class="category-container" id="categoryBar">
+      <button class="cat-btn active" data-cat="ALL">🔥 TÜM SON DAKİKA</button>
+      <button class="cat-btn" data-cat="GALATASARAY">🦁 GALATASARAY</button>
+      <button class="cat-btn" data-cat="FENERBAHÇE">🐦 FENERBAHÇE</button>
+      <button class="cat-btn" data-cat="BEŞİKTAŞ">🦅 BEŞİKTAŞ</button>
+      <button class="cat-btn" data-cat="TRABZONSPOR">🌊 TRABZONSPOR</button>
+      <button class="cat-btn" data-cat="TRANSFER">🔁 TRANSFER MERKEZİ</button>
+      <button class="cat-btn" data-cat="AVRUPA">🌍 AVRUPA & DÜNYA</button>
+    </div>
+  </nav>
+
+  <!-- 4. ANA İÇERİK -->
+  <main class="main-container">
+    <div class="left-column">
+      <!-- DEV MANŞET VİTRİNİ -->
+      <section class="hero-showcase" id="heroSection">
+        <div class="hero-slide" id="heroSlide">
+          <img id="heroImg" src="https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg" alt="Manşet" />
+          <div class="hero-gradient"></div>
+          <div class="hero-content">
+            <div class="hero-badges">
+              <span class="badge-red">FLAŞ GELİŞME</span>
+              <span class="badge-cat" id="heroCat">SON DAKİKA</span>
+              <span class="badge-time" id="heroTime">Az Önce</span>
+            </div>
+            <h1 class="hero-title" id="heroTitle">YÜKLENİYOR...</h1>
+            <p class="hero-summary" id="heroSummary"></p>
+          </div>
+        </div>
+        <div class="hero-tabs" id="heroTabs"></div>
+      </section>
+
+      <!-- SON DAKİKA HABER IZGARASI -->
+      <div class="section-header">
+        <h2 class="section-title" id="gridSectionTitle">GÜNÜN SON DAKİKA MANŞETLERİ</h2>
+        <div class="refresh-pill">
+          <span class="pulse-dot"></span>
+          <span id="lastUpdateText">Canlı Akış Aktif</span>
+        </div>
+      </div>
+
+      <div class="news-grid" id="newsGrid"></div>
+    </div>
+
+    <!-- SAĞ SÜTUN -->
+    <aside class="sidebar">
+      <!-- Sponsor & Resmi Hesap Kartı -->
+      <div class="sponsor-banner">
+        <img src="/templates/sponsors_footer.png" alt="Tam 90 Resmi Sponsorlar" />
+      </div>
+
+      <!-- Süper Lig Puan Durumu -->
+      <div class="widget-card">
+        <div class="widget-title">
+          <span>🏆 SÜPER LİG ZİRVE YARIŞI</span>
+          <span style="font-size:11px;color:#949ab1;">CANLI</span>
+        </div>
+        <table class="standings-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>TAKIM</th>
+              <th>O</th>
+              <th>AV</th>
+              <th style="text-align:right;">P</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="rank-num rank-1">1</span></td>
+              <td>Galatasaray</td>
+              <td>9</td>
+              <td>+19</td>
+              <td class="pts-col">25</td>
+            </tr>
+            <tr>
+              <td><span class="rank-num rank-2">2</span></td>
+              <td>Fenerbahçe</td>
+              <td>9</td>
+              <td>+15</td>
+              <td class="pts-col">22</td>
+            </tr>
+            <tr>
+              <td><span class="rank-num">3</span></td>
+              <td>Beşiktaş</td>
+              <td>9</td>
+              <td>+11</td>
+              <td class="pts-col">20</td>
+            </tr>
+            <tr>
+              <td><span class="rank-num">4</span></td>
+              <td>Samsunspor</td>
+              <td>9</td>
+              <td>+6</td>
+              <td class="pts-col">18</td>
+            </tr>
+            <tr>
+              <td><span class="rank-num">5</span></td>
+              <td>Başakşehir</td>
+              <td>9</td>
+              <td>+4</td>
+              <td class="pts-col">15</td>
+            </tr>
+            <tr>
+              <td><span class="rank-num">6</span></td>
+              <td>Trabzonspor</td>
+              <td>9</td>
+              <td>+2</td>
+              <td class="pts-col">13</td>
+            </tr>
+            <tr>
+              <td><span class="rank-num">7</span></td>
+              <td>Göztepe</td>
+              <td>9</td>
+              <td>+3</td>
+              <td class="pts-col">13</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- En Çok Okunanlar -->
+      <div class="widget-card">
+        <div class="widget-title">
+          <span>🔥 EN ÇOK KONUŞULANLAR</span>
+        </div>
+        <div id="trendingList" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- HABER DETAY MODALI -->
+  <div class="modal-backdrop" id="newsModal">
+    <div class="modal-box">
+      <button class="modal-close" id="modalCloseBtn">&times;</button>
+      <img class="modal-img" id="modalImg" src="" alt="" />
+      <div class="modal-content">
+        <div class="hero-badges">
+          <span class="badge-red">TAM 90 ÖZEL</span>
+          <span class="badge-cat" id="modalCat">FUTBOL</span>
+          <span class="badge-time" id="modalTime">Bugün</span>
+        </div>
+        <h2 class="modal-title" id="modalTitle"></h2>
+        <p class="modal-text" id="modalDesc"></p>
+        <div class="modal-actions">
+          <a id="modalSourceLink" href="#" target="_blank" class="btn-gold">Haberin Tüm Detayları ↗</a>
+          <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="ig-btn">📸 Instagram'da Tartışmaya Katıl</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALT FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <img src="/templates/sponsors_footer.png" alt="AYDESSA & LUSTER CAR" class="footer-sponsors-img" />
+      <p class="footer-copy">© 2026 TAM 90 (@tamdoksanaresmi) — Futbol'a Tutku. Tüm Son Dakika Haberleri Anlık Olarak Güncellenmektedir.</p>
+    </div>
+  </footer>
+
+  <script>
+    let allArticles = [];
+    let filteredArticles = [];
+    let currentHeroIndex = 0;
+    let heroInterval = null;
+    let activeCategory = 'ALL';
+
+    function detectCategory(title, summary) {
+      const text = (title + ' ' + summary).toLowerCase();
+      if (text.includes('galatasaray') || text.includes('okan buruk') || text.includes('icardi') || text.includes('osimhen') || text.includes('cimbom')) return 'GALATASARAY';
+      if (text.includes('fenerbahçe') || text.includes('mourinho') || text.includes('fener') || text.includes('ederson') || text.includes('nesyri')) return 'FENERBAHÇE';
+      if (text.includes('beşiktaş') || text.includes('sergen') || text.includes('siyah-beyaz') || text.includes('immobile') || text.includes('miretti')) return 'BEŞİKTAŞ';
+      if (text.includes('trabzonspor') || text.includes('şenol güneş') || text.includes('bordo-mavi')) return 'TRABZONSPOR';
+      if (text.includes('transfer') || text.includes('kanca') || text.includes('imza') || text.includes('teklif') || text.includes('bonservis')) return 'TRANSFER';
+      if (text.includes('ronaldo') || text.includes('real madrid') || text.includes('barcelona') || text.includes('münih') || text.includes('lille') || text.includes('avrupa') || text.includes('şampiyonlar ligi')) return 'AVRUPA';
+      return 'SÜPER LİG';
+    }
+
+    function renderHero(index) {
+      const top5 = filteredArticles.slice(0, 5);
+      if (!top5.length) return;
+      currentHeroIndex = index % top5.length;
+      const item = top5[currentHeroIndex];
+
+      document.getElementById('heroImg').src = item.image;
+      document.getElementById('heroCat').textContent = item.category;
+      document.getElementById('heroTime').textContent = item.timeAgo || 'SON DAKİKA';
+      document.getElementById('heroTitle').innerHTML = item.title;
+      document.getElementById('heroSummary').textContent = item.summary || item.title;
+
+      document.getElementById('heroSlide').onclick = () => openModal(item);
+
+      const tabsEl = document.getElementById('heroTabs');
+      tabsEl.innerHTML = top5.map((art, idx) => `
+        <button class="hero-tab ${idx === currentHeroIndex ? 'active' : ''}" onclick="selectHero(${idx})">
+          <span class="num">${idx + 1}</span>
+          <span class="tab-text">${art.title}</span>
+        </button>
+      `).join('');
+    }
+
+    function selectHero(idx) {
+      renderHero(idx);
+      if (heroInterval) clearInterval(heroInterval);
+      heroInterval = setInterval(() => renderHero(currentHeroIndex + 1), 6000);
+    }
+
+    function renderGrid() {
+      const gridEl = document.getElementById('newsGrid');
+      const list = filteredArticles.slice(0, 24);
+      gridEl.innerHTML = list.map((item, idx) => `
+        <article class="news-card" onclick="openModalByIndex(${idx})">
+          <div class="card-img-wrap">
+            <img src="${item.image}" alt="${item.title}" loading="lazy" />
+            <span class="card-cat-badge">${item.category}</span>
+            <span class="card-time-badge">⚡ ${item.timeAgo || 'Yeni'}</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-headline">${item.title}</h3>
+            <p class="card-desc">${item.summary || item.title}</p>
+            <div class="card-footer">
+              <span>TAM 90 HABER MERKEZİ</span>
+              <span>Detayları Oku →</span>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderTickerAndTrending() {
+      const tickerEl = document.getElementById('tickerContainer');
+      tickerEl.innerHTML = allArticles.slice(0, 12).map((item, idx) => `
+        <span class="ticker-item" onclick="openModalByGlobalIndex(${idx})">
+          <span class="time">${item.category}</span> ${item.title}
+        </span>
+      `).join('');
+
+      const trendEl = document.getElementById('trendingList');
+      trendEl.innerHTML = allArticles.slice(0, 6).map((item, idx) => `
+        <div onclick="openModalByGlobalIndex(${idx})" style="display:flex;gap:12px;align-items:center;cursor:pointer;padding:6px;border-radius:8px;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
+          <span class="rank-num ${idx < 2 ? 'rank-1' : ''}" style="flex-shrink:0;">${idx + 1}</span>
+          <div style="font-size:13px;font-weight:700;color:#e2e8f0;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${item.title}</div>
+        </div>
+      `).join('');
+    }
+
+    function applyFilter() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      filteredArticles = allArticles.filter(item => {
+        const matchCat = activeCategory === 'ALL' || item.category === activeCategory;
+        const matchQ = !q || (item.title + ' ' + item.summary).toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
+      if (!filteredArticles.length) filteredArticles = allArticles;
+      renderHero(0);
+      renderGrid();
+    }
+
+    function openModal(item) {
+      document.getElementById('modalImg').src = item.image;
+      document.getElementById('modalCat').textContent = item.category;
+      document.getElementById('modalTime').textContent = item.timeAgo || 'Son Dakika';
+      document.getElementById('modalTitle').textContent = item.title;
+      document.getElementById('modalDesc').textContent = item.summary || item.title;
+      document.getElementById('modalSourceLink').href = item.link || 'https://www.instagram.com/tamdoksanaresmi/';
+      document.getElementById('newsModal').classList.add('open');
+    }
+
+    function openModalByIndex(idx) {
+      if (filteredArticles[idx]) openModal(filteredArticles[idx]);
+    }
+
+    function openModalByGlobalIndex(idx) {
+      if (allArticles[idx]) openModal(allArticles[idx]);
+    }
+
+    document.getElementById('modalCloseBtn').onclick = () => {
+      document.getElementById('newsModal').classList.remove('open');
+    };
+    document.getElementById('newsModal').onclick = (e) => {
+      if (e.target.id === 'newsModal') document.getElementById('newsModal').classList.remove('open');
+    };
+
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCategory = btn.dataset.cat;
+        document.getElementById('gridSectionTitle').textContent =
+          activeCategory === 'ALL' ? 'GÜNÜN SON DAKİKA MANŞETLERİ' : `${activeCategory} SON DAKİKA HABERLERİ`;
+        applyFilter();
+      };
+    });
+
+    document.getElementById('searchInput').addEventListener('input', applyFilter);
+
+    async function fetchLiveNews() {
+      try {
+        const res = await fetch('/api/news');
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          allArticles = data.map((art, i) => ({
+            ...art,
+            category: art.category || detectCategory(art.title || '', art.summary || ''),
+            timeAgo: art.timeAgo || (i === 0 ? 'Az Önce' : `${i * 4 + 2} dk önce`)
+          }));
+          applyFilter();
+          renderTickerAndTrending();
+          const now = new Date();
+          document.getElementById('lastUpdateText').textContent =
+            `Son Güncelleme: ${now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
+        }
+      } catch (e) {
+        console.error('Haber akışı hatası:', e);
+      }
+    }
+
+    fetchLiveNews();
+    heroInterval = setInterval(() => renderHero(currentHeroIndex + 1), 6000);
+    setInterval(fetchLiveNews, 60000);
+  </script>
+</body>
+</html>
