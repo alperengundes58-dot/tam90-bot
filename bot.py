@@ -62,13 +62,92 @@ def restore_session_from_cloud():
             log(f"Oturum geri yükleme hatası: {e}")
     return False
 
-# 3. Web Sunucusu
+# 3. Web Sunucusu & TAM 90 Canlı Spor Portalı
 PORT = int(os.environ.get("PORT", 10000))
+PORTAL_NEWS_CACHE = {"ts": 0, "items": []}
+
+def get_portal_news_feed():
+    now = time.time()
+    if PORTAL_NEWS_CACHE["items"] and (now - PORTAL_NEWS_CACHE["ts"] < 120):
+        return PORTAL_NEWS_CACHE["items"]
+
+    sources = [
+        "https://www.haberturk.com/rss/spor.xml",
+        "https://ajansspor.com/rss",
+        "https://www.sabah.com.tr/rss/spor.xml"
+    ]
+    skip_keywords = ["voleybol", "hentbol", "güreş", "atletizm", "boks", "tenis"]
+    seen = set()
+    items = []
+
+    for url in sources:
+        try:
+            feed = feedparser.parse(url)
+            for entry in feed.entries[:20]:
+                title = clean_html(entry.get("title", ""))
+                summary = clean_html(entry.get("summary", "") or entry.get("description", ""))
+                link = entry.get("link", "")
+                if not title or title in seen:
+                    continue
+                if any(sk in title.lower() for sk in skip_keywords):
+                    continue
+
+                img_url = None
+                if 'enclosures' in entry and len(entry.enclosures) > 0:
+                    img_url = entry.enclosures[0].get('href')
+                if not img_url and 'media_content' in entry and len(entry.media_content) > 0:
+                    img_url = entry.media_content[0].get('url')
+
+                if img_url and "http" in img_url:
+                    if "u=http" in img_url:
+                        try:
+                            img_url = urllib.parse.unquote(img_url.split("u=")[1])
+                        except:
+                            pass
+                    seen.add(title)
+                    idx = len(items)
+                    items.append({
+                        "title": title,
+                        "summary": summary if summary and len(summary) > 20 else title,
+                        "image": img_url,
+                        "link": link,
+                        "timeAgo": "Az Önce" if idx < 2 else f"{idx * 3 + 1} dk önce"
+                    })
+                    if len(items) >= 30:
+                        break
+        except Exception as e:
+            log(f"Portal RSS uyarısı ({url}): {e}")
+        if len(items) >= 30:
+            break
+
+    if items:
+        PORTAL_NEWS_CACHE["ts"] = now
+        PORTAL_NEWS_CACHE["items"] = items
+    return PORTAL_NEWS_CACHE["items"]
 
 class HealthHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         params = urllib.parse.parse_qs(parsed.query)
+
+        if parsed.path == '/api/news':
+            self.send_response(200)
+            self.send_header("Content-type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            news = get_portal_news_feed()
+            self.wfile.write(json.dumps(news, ensure_ascii=False).encode("utf-8"))
+            return
+
+        if parsed.path in ['/templates/tam90_logo.png', '/templates/sponsors_footer.png']:
+            asset_file = Path(__file__).parent / parsed.path.lstrip('/')
+            if asset_file.exists():
+                self.send_response(200)
+                self.send_header("Content-type", "image/png")
+                self.send_header("Cache-Control", "public, max-age=3600")
+                self.end_headers()
+                self.wfile.write(asset_file.read_bytes())
+                return
 
         if parsed.path == '/logs':
             self.send_response(200)
@@ -100,6 +179,14 @@ class HealthHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"status": "ok", "message": "Onaylanan 4K Ronaldo Görseli Yükleniyor!"}).encode("utf-8"))
             threading.Thread(target=execute_approved_post).start()
+            return
+
+        index_file = Path(__file__).parent / "index.html"
+        if index_file.exists():
+            self.send_response(200)
+            self.send_header("Content-type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(index_file.read_bytes())
             return
 
         self.send_response(200)
@@ -150,12 +237,17 @@ def login_instagram(two_factor_code=None):
 ALREADY_POSTED_FILE = Path(__file__).parent / "posted_articles.json"
 
 def get_posted_titles():
+    default_posted = {
+        "Cristiano Ronaldo durdurulamıyor! 982. golünü attı",
+        "B.Münih'in hocası hastaneye kaldırıldı!"
+    }
     if ALREADY_POSTED_FILE.exists():
         try:
-            return set(json.loads(ALREADY_POSTED_FILE.read_text(encoding="utf-8")))
+            saved = set(json.loads(ALREADY_POSTED_FILE.read_text(encoding="utf-8")))
+            return saved.union(default_posted)
         except:
-            return set()
-    return set()
+            return default_posted
+    return default_posted
 
 def save_posted_title(title):
     posted = get_posted_titles()
