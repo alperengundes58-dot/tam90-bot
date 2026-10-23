@@ -1,0 +1,24 @@
+{
+  "name": "TAM 90 | Canlı Spor & Futbol Portalı",
+  "short_name": "TAM 90",
+  "description": "7/24 Otomatik Güncellenen Son Dakika Futbol Haberleri, TFF Canlı Puan Durumu, Fikstür ve Maç Merkezi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07080c",
+  "theme_color": "#07080c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "templates/tam90_profile.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "templates/tam90_profile.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
