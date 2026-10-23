@@ -904,13 +904,44 @@
     </div>
   </nav>
 
+  <!-- 3.5 GÜNÜN MAÇLARI & SKOR MERKEZİ -->
+  <div style="background:#090b11;border-bottom:1px solid var(--border);padding:10px 0;">
+    <div style="max-width:1340px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:14px;overflow-x:auto;scrollbar-width:none;">
+      <span style="font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:12px;color:var(--gold);letter-spacing:1px;white-space:nowrap;padding-right:6px;border-right:1px solid var(--border);">⚽️ MAÇ MERKEZİ</span>
+      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:12.5px;font-weight:700;">
+        <span style="color:#949ab1;font-size:11px;">SÜPER LİG</span>
+        <span>Galatasaray</span>
+        <span style="background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:900;">3 - 1</span>
+        <span>Beşiktaş</span>
+      </div>
+      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:12.5px;font-weight:700;">
+        <span style="color:#949ab1;font-size:11px;">SÜPER LİG</span>
+        <span>Fenerbahçe</span>
+        <span style="background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:900;">2 - 0</span>
+        <span>Bodrum FK</span>
+      </div>
+      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:12.5px;font-weight:700;">
+        <span style="color:#949ab1;font-size:11px;">SÜPER LİG</span>
+        <span>Trabzonspor</span>
+        <span style="background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:900;">1 - 0</span>
+        <span>Başakşehir</span>
+      </div>
+      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:12.5px;font-weight:700;">
+        <span style="color:#e50914;font-size:11px;">AVRUPA</span>
+        <span>Al-Nassr</span>
+        <span style="background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:900;">2 - 1</span>
+        <span>Al-Shabab</span>
+      </div>
+    </div>
+  </div>
+
   <!-- 4. ANA İÇERİK -->
   <main class="main-container">
     <div class="left-column">
       <!-- DEV MANŞET VİTRİNİ -->
       <section class="hero-showcase" id="heroSection">
         <div class="hero-slide" id="heroSlide">
-          <img id="heroImg" src="https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg" alt="Manşet" />
+          <img id="heroImg" referrerpolicy="no-referrer" onerror="this.src='https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg'" src="https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg" alt="Manşet" />
           <div class="hero-gradient"></div>
           <div class="hero-content">
             <div class="hero-badges">
@@ -1020,6 +1051,33 @@
           <span>🔥 EN ÇOK KONUŞULANLAR</span>
         </div>
         <div id="trendingList" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+
+      <!-- Canlı Taraftar Anketi -->
+      <div class="widget-card">
+        <div class="widget-title">
+          <span>📊 TARAFTAR ANKETİ</span>
+          <span style="font-size:11px;color:#949ab1;">14.820 OY</span>
+        </div>
+        <p style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:12px;">Sizce bu sezon Süper Lig şampiyonu hangi takım olur?</p>
+        <div id="pollContainer" style="display:flex;flex-direction:column;gap:9px;">
+          <button onclick="votePoll(0)" style="background:#161a26;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+            <span>🦁 Galatasaray</span>
+            <span style="color:var(--gold);">%44</span>
+          </button>
+          <button onclick="votePoll(1)" style="background:#161a26;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+            <span>🐦 Fenerbahçe</span>
+            <span style="color:var(--gold);">%39</span>
+          </button>
+          <button onclick="votePoll(2)" style="background:#161a26;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+            <span>🦅 Beşiktaş</span>
+            <span style="color:var(--gold);">%12</span>
+          </button>
+          <button onclick="votePoll(3)" style="background:#161a26;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+            <span>🌊 Trabzonspor</span>
+            <span style="color:var(--gold);">%5</span>
+          </button>
+        </div>
       </div>
     </aside>
   </main>
@@ -1146,10 +1204,11 @@
     function renderGrid() {
       const gridEl = document.getElementById('newsGrid');
       const list = filteredArticles.slice(0, 24);
+      const fallbackImg = 'https://cdn.ajansspor.com/ajansspor/photo/2026/10/52d8ad8c-9c22-4e4d-84cc-5a00462e66f6.jpg';
       gridEl.innerHTML = list.map((item, idx) => `
         <article class="news-card" onclick="openModalByIndex(${idx})">
           <div class="card-img-wrap">
-            <img src="${item.image}" alt="${item.title}" loading="lazy" />
+            <img src="${item.image}" referrerpolicy="no-referrer" onerror="this.src='${fallbackImg}'" alt="${item.title}" loading="lazy" />
             <span class="card-cat-badge">${item.category}</span>
             <span class="card-time-badge">⚡ ${item.timeAgo || 'Yeni'}</span>
           </div>
@@ -1163,6 +1222,14 @@
           </div>
         </article>
       `).join('');
+    }
+
+    function votePoll(choice) {
+      const buttons = document.querySelectorAll('#pollContainer button');
+      buttons.forEach((btn, idx) => {
+        btn.style.borderColor = idx === choice ? 'var(--gold)' : 'var(--border)';
+        btn.style.background = idx === choice ? 'rgba(255, 212, 0, 0.14)' : '#161a26';
+      });
     }
 
     function renderTickerAndTrending() {
