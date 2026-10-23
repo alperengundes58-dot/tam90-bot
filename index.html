@@ -2,9 +2,15 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07080c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TAM 90" />
   <title>TAM 90 | Futbol'a Tutku — Canlı Puan Durumu, Fikstür & Son Dakika Spor</title>
   <link rel="icon" type="image/png" href="templates/tam90_profile.png" />
+  <link rel="apple-touch-icon" href="templates/tam90_profile.png" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&family=Chakra+Petch:ital,wght@0,600;0,700;1,700&display=swap" rel="stylesheet">
@@ -13,7 +19,7 @@
       --bg-dark: #07080c;
       --bg-card: #10131c;
       --bg-card-hover: #171b28;
-      --bg-glass: rgba(16, 19, 28, 0.86);
+      --bg-glass: rgba(16, 19, 28, 0.92);
       --gold: #FFD400;
       --neon-green: #68e325;
       --gold-dark: #FFA800;
@@ -28,6 +34,11 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -44,7 +55,7 @@
     /* 1. SON DAKİKA CANLI BANT (TICKER) */
     .breaking-bar {
       background: linear-gradient(90deg, #b80000 0%, #e50914 50%, #990000 100%);
-      height: 40px;
+      height: 38px;
       display: flex;
       align-items: center;
       overflow: hidden;
@@ -59,24 +70,34 @@
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 800;
       font-style: italic;
-      font-size: 13px;
-      letter-spacing: 1px;
-      padding: 0 18px;
+      font-size: 12.5px;
+      letter-spacing: 0.8px;
+      padding: 0 14px;
       height: 100%;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       flex-shrink: 0;
       box-shadow: 6px 0 18px rgba(0, 0, 0, 0.45);
       z-index: 2;
     }
 
     .pulse-dot {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       background: #e50914;
       border-radius: 50%;
       animation: pulse 1.2s infinite;
+      flex-shrink: 0;
+    }
+
+    .pulse-dot-green {
+      width: 8px;
+      height: 8px;
+      background: var(--neon-green);
+      border-radius: 50%;
+      animation: pulse 1.2s infinite;
+      flex-shrink: 0;
     }
 
     @keyframes pulse {
@@ -96,7 +117,7 @@
       display: inline-block;
       white-space: nowrap;
       padding-left: 100%;
-      animation: ticker 42s linear infinite;
+      animation: ticker 40s linear infinite;
     }
 
     .ticker-move:hover {
@@ -105,8 +126,8 @@
 
     .ticker-item {
       display: inline-block;
-      margin-right: 55px;
-      font-size: 13.5px;
+      margin-right: 48px;
+      font-size: 13px;
       font-weight: 600;
       color: #fff;
       cursor: pointer;
@@ -117,9 +138,9 @@
       color: var(--gold);
       padding: 2px 7px;
       border-radius: 4px;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
-      margin-right: 8px;
+      margin-right: 7px;
     }
 
     @keyframes ticker {
@@ -129,7 +150,7 @@
 
     /* 2. ÜST NAVBAR & YENİ PROFİL RESMİ */
     .navbar {
-      background: rgba(10, 12, 18, 0.94);
+      background: rgba(10, 12, 18, 0.95);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       position: sticky;
@@ -140,24 +161,24 @@
     .nav-container {
       max-width: 1380px;
       margin: 0 auto;
-      padding: 12px 24px;
+      padding: 11px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
+      gap: 16px;
       flex-wrap: wrap;
     }
 
     .brand-box {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       text-decoration: none;
     }
 
     .brand-profile-avatar {
-      width: 58px;
-      height: 58px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
       object-fit: cover;
       box-shadow: 0 0 18px rgba(104, 227, 37, 0.45);
@@ -170,14 +191,14 @@
     }
 
     .brand-logo {
-      height: 48px;
+      height: 44px;
       width: auto;
       filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
     }
 
     .brand-divider {
       width: 1px;
-      height: 36px;
+      height: 34px;
       background: var(--border);
     }
 
@@ -189,20 +210,20 @@
     .brand-tagline .title {
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--gold);
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
     }
 
     .brand-tagline .sub {
-      font-size: 11.5px;
+      font-size: 11px;
       color: var(--text-muted);
     }
 
     .search-and-social {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
 
     .search-box {
@@ -216,7 +237,7 @@
       border: 1px solid var(--border);
       color: #fff;
       padding: 9px 14px 9px 36px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 13px;
       outline: none;
       transition: border 0.2s;
@@ -242,19 +263,20 @@
       color: #fff;
       text-decoration: none;
       font-weight: 700;
-      font-size: 13px;
-      padding: 6px 14px 6px 8px;
+      font-size: 12.5px;
+      padding: 5px 13px 5px 7px;
       border-radius: 30px;
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 8px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
     .ig-btn img {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       object-fit: cover;
     }
@@ -277,9 +299,10 @@
       padding: 0 24px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       overflow-x: auto;
       scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
 
     .category-container::-webkit-scrollbar {
@@ -292,8 +315,8 @@
       color: var(--text-muted);
       font-family: 'Inter', sans-serif;
       font-weight: 700;
-      font-size: 13px;
-      padding: 13px 16px;
+      font-size: 12.5px;
+      padding: 12px 14px;
       cursor: pointer;
       white-space: nowrap;
       border-bottom: 3px solid transparent;
@@ -310,26 +333,59 @@
     .cat-btn.active {
       color: var(--gold);
       border-bottom-color: var(--gold);
-      background: rgba(255, 212, 0, 0.04);
+      background: rgba(255, 212, 0, 0.05);
+    }
+
+    /* 3.5 MAÇ MERKEZİ ŞERİDİ */
+    .match-strip-bar {
+      background: #090b11;
+      border-bottom: 1px solid var(--border);
+      padding: 9px 0;
+    }
+
+    .match-strip-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .match-strip-inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    .match-pill {
+      background: #121622;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      white-space:nowrap;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .match-pill.derby {
+      background: linear-gradient(90deg, rgba(229, 9, 20, 0.18), rgba(255, 212, 0, 0.18));
+      border-color: var(--gold);
     }
 
     /* 4. ANA İÇERİK DÜZENİ */
     .main-container {
       max-width: 1380px;
-      margin: 24px auto;
+      margin: 22px auto;
       padding: 0 24px;
       display: grid;
       grid-template-columns: 1fr 410px;
       gap: 26px;
-    }
-
-    @media (max-width: 1080px) {
-      .main-container {
-        grid-template-columns: 1fr;
-      }
-      .search-box {
-        width: 180px;
-      }
     }
 
     /* 5. DEV MANŞET VİTRİNİ (HERO SLIDER) */
@@ -339,13 +395,14 @@
       overflow: hidden;
       border: 1px solid var(--border);
       position: relative;
-      margin-bottom: 28px;
+      margin-bottom: 26px;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+      touch-action: pan-y;
     }
 
     .hero-slide {
       position: relative;
-      height: 490px;
+      height: 480px;
       width: 100%;
       cursor: pointer;
       overflow: hidden;
@@ -369,26 +426,27 @@
       inset: 0;
       background: linear-gradient(
         to bottom,
-        rgba(7, 8, 12, 0.15) 0%,
-        rgba(7, 8, 12, 0.35) 40%,
-        rgba(7, 8, 12, 0.92) 78%,
+        rgba(7, 8, 12, 0.1) 0%,
+        rgba(7, 8, 12, 0.35) 38%,
+        rgba(7, 8, 12, 0.93) 76%,
         #07080c 100%
       );
     }
 
     .hero-content {
       position: absolute;
-      bottom: 68px;
-      left: 32px;
-      right: 32px;
+      bottom: 66px;
+      left: 28px;
+      right: 28px;
       z-index: 5;
     }
 
     .hero-badges {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
     }
 
     .badge-red {
@@ -396,8 +454,8 @@
       color: #fff;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 800;
-      font-size: 12px;
-      padding: 4px 11px;
+      font-size: 11.5px;
+      padding: 4px 10px;
       border-radius: 5px;
       letter-spacing: 0.8px;
       text-transform: uppercase;
@@ -408,32 +466,32 @@
       color: var(--gold);
       border: 1px solid var(--border-gold);
       font-weight: 700;
-      font-size: 12px;
+      font-size: 11.5px;
       padding: 4px 10px;
       border-radius: 5px;
     }
 
     .badge-time {
       color: #cbd5e1;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 600;
     }
 
     .hero-title {
       font-family: 'Anton', Impact, sans-serif;
-      font-size: clamp(28px, 3.8vw, 46px);
+      font-size: clamp(24px, 3.8vw, 45px);
       line-height: 1.08;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.7px;
       text-transform: uppercase;
       color: #fff;
       text-shadow: 0 6px 22px rgba(0, 0, 0, 0.95), 2px 4px 0 #000;
-      margin-bottom: 10px;
-      transform: skewX(-6deg);
+      margin-bottom: 9px;
+      transform: skewX(-5deg);
     }
 
     .hero-summary {
       color: #d1d5db;
-      font-size: 14.5px;
+      font-size: 14px;
       max-width: 820px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -446,8 +504,8 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 54px;
-      background: rgba(10, 12, 18, 0.94);
+      height: 52px;
+      background: rgba(10, 12, 18, 0.95);
       border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -459,13 +517,13 @@
       background: transparent;
       color: var(--text-muted);
       font-weight: 700;
-      font-size: 12.5px;
-      padding: 0 14px;
+      font-size: 12px;
+      padding: 0 12px;
       cursor: pointer;
       border-right: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       text-align: left;
       transition: all 0.2s;
       overflow: hidden;
@@ -510,12 +568,14 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 18px;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
     }
 
     .section-title {
       font-family: 'Chakra Petch', sans-serif;
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
       font-style: italic;
       display: flex;
@@ -527,29 +587,29 @@
     .section-title::before {
       content: "";
       width: 6px;
-      height: 22px;
+      height: 20px;
       background: var(--gold);
       border-radius: 3px;
       display: inline-block;
     }
 
     .refresh-pill {
-      background: #161a26;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 6px 12px;
+      background: #141824;
+      border: 1px solid rgba(104, 227, 37, 0.35);
+      color: #e2e8f0;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 12px;
       border-radius: 20px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
     }
 
     .news-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
-      gap: 20px;
+      gap: 18px;
     }
 
     .news-card {
@@ -564,7 +624,7 @@
     }
 
     .news-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-4px);
       border-color: var(--border-gold);
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
     }
@@ -589,13 +649,13 @@
 
     .card-cat-badge {
       position: absolute;
-      top: 12px;
-      left: 12px;
+      top: 11px;
+      left: 11px;
       background: rgba(7, 8, 12, 0.85);
       backdrop-filter: blur(6px);
       color: var(--gold);
       border: 1px solid var(--border-gold);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 800;
       padding: 3px 9px;
       border-radius: 5px;
@@ -606,7 +666,7 @@
       position: absolute;
       bottom: 10px;
       right: 10px;
-      background: rgba(0, 0, 0, 0.78);
+      background: rgba(0, 0, 0, 0.8);
       color: #e2e8f0;
       font-size: 11px;
       font-weight: 600;
@@ -615,7 +675,7 @@
     }
 
     .card-body {
-      padding: 16px;
+      padding: 15px;
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -626,7 +686,7 @@
       font-size: 15.5px;
       line-height: 1.35;
       color: #fff;
-      margin-bottom: 9px;
+      margin-bottom: 8px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -645,13 +705,13 @@
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      margin-bottom: 14px;
+      margin-bottom: 13px;
       flex: 1;
     }
 
     .card-footer {
       border-top: 1px solid var(--border);
-      padding-top: 11px;
+      padding-top: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -660,27 +720,27 @@
       color: var(--gold);
     }
 
-    /* 7. SAĞ SÜTUN (PROFİL KARTI + CANLI PUAN DURUMU/FİKSTÜR/GOL KRALLIĞI) */
+    /* 7. SAĞ SÜTUN */
     .sidebar {
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 20px;
     }
 
     .profile-card {
       background: linear-gradient(145deg, #101520 0%, #0b0e15 100%);
       border: 1px solid rgba(104, 227, 37, 0.35);
       border-radius: 16px;
-      padding: 18px;
+      padding: 16px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     }
 
     .profile-card-avatar {
-      width: 78px;
-      height: 78px;
+      width: 74px;
+      height: 74px;
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
@@ -731,20 +791,17 @@
       transition: opacity 0.2s;
     }
 
-    .profile-follow-btn:hover {
-      opacity: 0.9;
-    }
-
     .widget-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 18px;
+      padding: 16px;
+      scroll-margin-top: 80px;
     }
 
     .widget-title {
       font-family: 'Chakra Petch', sans-serif;
-      font-size: 15.5px;
+      font-size: 15px;
       font-weight: 800;
       font-style: italic;
       color: var(--gold);
@@ -773,7 +830,7 @@
       color: var(--text-muted);
       font-size: 11px;
       font-weight: 800;
-      padding: 7px 4px;
+      padding: 8px 4px;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s;
@@ -789,7 +846,7 @@
     .standings-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 12.2px;
+      font-size: 12px;
     }
 
     .standings-table th {
@@ -808,7 +865,7 @@
     }
 
     .standings-table td {
-      padding: 7px 3px;
+      padding: 7.5px 3px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       font-weight: 600;
       text-align: center;
@@ -831,26 +888,10 @@
       color: #cbd5e1;
     }
 
-    .rank-1 {
-      background: var(--gold);
-      color: #000;
-    }
-
-    .rank-2 {
-      background: #68e325;
-      color: #000;
-    }
-
-    .rank-3, .rank-4 {
-      background: #38bdf8;
-      color: #000;
-    }
-
-    .rank-rel {
-      background: rgba(229, 9, 20, 0.25);
-      color: #ff6b6b;
-      border: 1px solid rgba(229, 9, 20, 0.4);
-    }
+    .rank-1 { background: var(--gold); color: #000; }
+    .rank-2 { background: #68e325; color: #000; }
+    .rank-3, .rank-4 { background: #38bdf8; color: #000; }
+    .rank-rel { background: rgba(229, 9, 20, 0.25); color: #ff6b6b; border: 1px solid rgba(229, 9, 20, 0.4); }
 
     .pts-col {
       color: var(--gold);
@@ -862,7 +903,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 10px;
+      padding: 8.5px 10px;
       background: #141824;
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -880,10 +921,10 @@
       background: var(--gold);
       color: #000;
       font-weight: 900;
-      padding: 2px 8px;
+      padding: 3px 9px;
       border-radius: 5px;
       font-size: 11.5px;
-      min-width: 52px;
+      min-width: 56px;
       text-align: center;
     }
 
@@ -891,10 +932,10 @@
       background: #1f2637;
       color: #cbd5e1;
       font-weight: 800;
-      padding: 2px 8px;
+      padding: 3px 8px;
       border-radius: 5px;
       font-size: 11px;
-      min-width: 52px;
+      min-width: 68px;
       text-align: center;
     }
 
@@ -914,17 +955,17 @@
       border-radius: 8px;
     }
 
-    /* 8. HABER DETAY MODALI */
+    /* 8. HABER DETAY MODALI (MASAÜSTÜ & MOBİL BOTTOM-SHEET) */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.82);
+      background: rgba(0, 0, 0, 0.84);
       backdrop-filter: blur(8px);
       display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      z-index: 200;
+      z-index: 300;
     }
 
     .modal-backdrop.open {
@@ -947,47 +988,50 @@
       position: absolute;
       top: 14px;
       right: 14px;
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      border: none;
-      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(0, 0, 0, 0.78);
       color: #fff;
-      font-size: 20px;
+      font-size: 22px;
       cursor: pointer;
       z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .modal-img {
       width: 100%;
-      max-height: 390px;
+      max-height: 380px;
       object-fit: cover;
     }
 
     .modal-content {
-      padding: 26px;
+      padding: 24px;
     }
 
     .modal-title {
       font-family: 'Anton', Impact, sans-serif;
-      font-size: 30px;
+      font-size: clamp(22px, 4vw, 30px);
       letter-spacing: 0.6px;
       line-height: 1.15;
       color: var(--gold);
-      margin: 10px 0 16px;
+      margin: 10px 0 14px;
       text-transform: uppercase;
     }
 
     .modal-text {
       color: #e2e8f0;
-      font-size: 15.5px;
+      font-size: 15px;
       line-height: 1.7;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .modal-actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
@@ -995,20 +1039,37 @@
       background: var(--gold);
       color: #000;
       font-weight: 800;
-      font-size: 13.5px;
-      padding: 10px 18px;
-      border-radius: 8px;
+      font-size: 13px;
+      padding: 10px 16px;
+      border-radius: 9px;
       text-decoration: none;
       border: none;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-share {
+      background: #1a2234;
+      color: #fff;
+      border: 1px solid var(--border);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 16px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     /* 9. ALT FOOTER */
     footer {
       background: #000;
       border-top: 1px solid var(--border);
-      margin-top: 50px;
-      padding: 28px 20px;
+      margin-top: 48px;
+      padding: 28px 20px 90px;
       text-align: center;
     }
 
@@ -1027,7 +1088,161 @@
 
     .footer-copy {
       color: var(--text-muted);
-      font-size: 12.5px;
+      font-size: 12px;
+    }
+
+    /* 10. SABİT MOBİL ALT UYGULAMA BARI (NATIVE APP BOTTOM NAV) */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 12, 18, 0.96);
+      backdrop-filter: blur(18px);
+      border-top: 1px solid rgba(255, 212, 0, 0.22);
+      padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+      z-index: 250;
+      grid-template-columns: repeat(5, 1fr);
+      box-shadow: 0 -8px 26px rgba(0, 0, 0, 0.7);
+    }
+
+    .m-nav-item {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 5px 2px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .m-nav-item .m-icon {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .m-nav-item.active {
+      color: var(--gold);
+      background: rgba(255, 212, 0, 0.08);
+    }
+
+    /* 11. MOBİL VE TABLET RESPONSIVE KURALLARI */
+    @media (max-width: 1080px) {
+      .main-container {
+        grid-template-columns: 1fr;
+        margin: 16px auto;
+        padding: 0 14px;
+      }
+      .mobile-bottom-nav {
+        display: grid;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .breaking-bar {
+        height: 34px;
+      }
+      .breaking-label {
+        font-size: 11px;
+        padding: 0 10px;
+      }
+      .ticker-item {
+        font-size: 12px;
+      }
+      .nav-container {
+        padding: 10px 14px;
+        gap: 10px;
+      }
+      .brand-profile-avatar {
+        width: 44px;
+        height: 44px;
+      }
+      .brand-logo {
+        height: 34px;
+      }
+      .brand-divider,
+      .brand-tagline {
+        display: none;
+      }
+      .search-and-social {
+        width: 100%;
+        order: 3;
+      }
+      .search-box {
+        flex: 1;
+        width: 100%;
+      }
+      .category-container {
+        padding: 0 12px;
+      }
+      .cat-btn {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      .match-strip-inner {
+        padding: 0 12px;
+      }
+      .hero-showcase {
+        margin-bottom: 20px;
+        border-radius: 14px;
+      }
+      .hero-slide {
+        height: 360px;
+      }
+      .hero-content {
+        left: 16px;
+        right: 16px;
+        bottom: 56px;
+      }
+      .hero-title {
+        font-size: clamp(21px, 6vw, 30px);
+        transform: skewX(-3deg);
+      }
+      .hero-summary {
+        font-size: 12.5px;
+        -webkit-line-clamp: 2;
+      }
+      .hero-tabs {
+        height: 44px;
+      }
+      .hero-tab {
+        justify-content: center;
+        padding: 0;
+      }
+      .hero-tab .tab-text {
+        display: none;
+      }
+      .news-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .card-img-wrap {
+        height: 195px;
+      }
+      .modal-backdrop {
+        padding: 0;
+        align-items: flex-end;
+      }
+      .modal-box {
+        border-radius: 20px 20px 0 0;
+        max-height: 92vh;
+        border-bottom: none;
+      }
+      .modal-img {
+        max-height: 250px;
+      }
+      .modal-content {
+        padding: 18px 16px 28px;
+      }
     }
   </style>
 </head>
@@ -1041,7 +1256,7 @@
     </div>
     <div class="ticker-wrap">
       <div class="ticker-move" id="tickerContainer">
-        <span class="ticker-item"><span class="time">CANLI</span> TAM 90 Spor Portalı üzerinden TFF resmi puan durumu ve anlık futbol gelişmeleri yükleniyor...</span>
+        <span class="ticker-item"><span class="time">CANLI</span> TAM 90 Spor Portalı 7/24 Otopilot Entegrasyonu ile TFF Puan Durumu ve Son Dakika Haberleri yükleniyor...</span>
       </div>
     </div>
   </div>
@@ -1049,31 +1264,32 @@
   <!-- 2. ÜST NAVBAR & YENİ PROFİL RESMİ -->
   <header class="navbar">
     <div class="nav-container">
-      <a href="/" class="brand-box">
+      <a href="#top" class="brand-box">
         <img src="templates/tam90_profile.png" alt="TAM 90 Profil" class="brand-profile-avatar" />
         <img src="templates/tam90_logo.png" alt="TAM 90 Logo" class="brand-logo" />
         <div class="brand-divider"></div>
         <div class="brand-tagline">
-          <span class="title">CANLI SKOR, PUAN DURUMU & HABER MERKEZİ</span>
-          <span class="sub">TFF Resmi Verileri ve 7/24 Son Dakika Futbol</span>
+          <span class="title">7/24 OTOPİLOT CANLI SPOR & FUTBOL PORTALI</span>
+          <span class="sub">TFF Resmi Puan Durumu, Fikstür & Anlık Son Dakika Entegrasyonu</span>
         </div>
+      </a>
+
+      <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="ig-btn">
+        <img src="templates/tam90_profile.png" alt="@tamdoksanaresmi" />
+        <span>@tamdoksanaresmi</span>
       </a>
 
       <div class="search-and-social">
         <div class="search-box">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          <input type="text" id="searchInput" placeholder="Takım, oyuncu veya haber ara..." />
+          <input type="text" id="searchInput" placeholder="Takım, futbolcu veya son dakika ara..." />
         </div>
-        <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="ig-btn">
-          <img src="templates/tam90_profile.png" alt="@tamdoksanaresmi" />
-          <span>@tamdoksanaresmi</span>
-        </a>
       </div>
     </div>
   </header>
 
   <!-- 3. KATEGORİ SEKMELERİ -->
-  <nav class="category-bar">
+  <nav class="category-bar" id="top">
     <div class="category-container" id="categoryBar">
       <button class="cat-btn active" data-cat="ALL">🔥 TÜM SON DAKİKA</button>
       <button class="cat-btn" data-cat="GALATASARAY">🦁 GALATASARAY</button>
@@ -1081,51 +1297,51 @@
       <button class="cat-btn" data-cat="BEŞİKTAŞ">🦅 BEŞİKTAŞ</button>
       <button class="cat-btn" data-cat="TRABZONSPOR">🌊 TRABZONSPOR</button>
       <button class="cat-btn" data-cat="SÜPER LİG">🏆 SÜPER LİG</button>
-      <button class="cat-btn" data-cat="AVRUPA">🌍 AVRUPA & ŞAMPİYONLAR LİGİ</button>
+      <button class="cat-btn" data-cat="AVRUPA">🌍 AVRUPA & UCL</button>
     </div>
   </nav>
 
   <!-- 3.5 CANLI MAÇ MERKEZİ (TFF 9. HAFTA & AVRUPA KUPALARI) -->
-  <div style="background:#090b11;border-bottom:1px solid var(--border);padding:10px 0;">
-    <div id="topMatchStrip" style="max-width:1380px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:12px;overflow-x:auto;scrollbar-width:none;">
-      <span style="font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:12px;color:var(--gold);letter-spacing:1px;white-space:nowrap;padding-right:8px;border-right:1px solid var(--border);">⚽️ 9. HAFTA & AVRUPA</span>
+  <div class="match-strip-bar">
+    <div id="topMatchStrip" class="match-strip-inner">
+      <span style="font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:11.5px;color:var(--gold);letter-spacing:0.8px;white-space:nowrap;padding-right:8px;border-right:1px solid var(--border);">⚽️ CANLI MAÇ MERKEZİ</span>
 
-      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+      <div class="match-pill">
         <span style="color:#68e325;font-size:10.5px;">MS • 9. HAFTA</span>
         <span>Alanyaspor</span>
         <span style="background:var(--gold);color:#000;padding:2px 7px;border-radius:4px;font-weight:900;">1 - 2</span>
         <span>Kocaelispor</span>
       </div>
 
-      <div style="background:linear-gradient(90deg,rgba(229,9,20,0.18),rgba(255,212,0,0.18));border:1px solid var(--gold);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+      <div class="match-pill derby">
         <span style="color:var(--gold);font-size:10.5px;">🔥 26 EKİM 21:30</span>
         <span>Galatasaray</span>
         <span style="background:#e50914;color:#fff;padding:2px 7px;border-radius:4px;font-weight:900;">DERBİ</span>
         <span>Fenerbahçe</span>
       </div>
 
-      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+      <div class="match-pill">
         <span style="color:#949ab1;font-size:10.5px;">BUGÜN 19:00</span>
         <span>Samsunspor</span>
         <span style="background:#1e2638;color:#fff;padding:2px 7px;border-radius:4px;font-weight:800;">v</span>
         <span>Amed SF</span>
       </div>
 
-      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+      <div class="match-pill">
         <span style="color:#38bdf8;font-size:10.5px;">UCL • MS</span>
         <span>Lille</span>
         <span style="background:var(--gold);color:#000;padding:2px 7px;border-radius:4px;font-weight:900;">2 - 4</span>
         <span>Galatasaray</span>
       </div>
 
-      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+      <div class="match-pill">
         <span style="color:#38bdf8;font-size:10.5px;">UCL • MS</span>
         <span>Fenerbahçe</span>
         <span style="background:var(--gold);color:#000;padding:2px 7px;border-radius:4px;font-weight:900;">2 - 2</span>
         <span>Slavia Prag</span>
       </div>
 
-      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+      <div class="match-pill">
         <span style="color:#fb923c;font-size:10.5px;">UEL • MS</span>
         <span>Beşiktaş</span>
         <span style="background:var(--gold);color:#000;padding:2px 7px;border-radius:4px;font-weight:900;">2 - 2</span>
@@ -1136,8 +1352,8 @@
 
   <!-- 4. ANA İÇERİK -->
   <main class="main-container">
-    <div class="left-column">
-      <!-- DEV MANŞET VİTRİNİ -->
+    <div class="left-column" id="newsSectionTop">
+      <!-- DEV MANŞET VİTRİNİ (PARMAKLA KAYDIRMALI MOBİL DESTEKLİ) -->
       <section class="hero-showcase" id="heroSection">
         <div class="hero-slide" id="heroSlide">
           <img id="heroImg" referrerpolicy="no-referrer" onerror="this.src='https://im.haberturk.com/l/2026/10/23/ver1792757508/3922039/jpg/1920x1080'" src="https://im.haberturk.com/l/2026/10/23/ver1792757508/3922039/jpg/1920x1080" alt="Manşet" />
@@ -1159,8 +1375,8 @@
       <div class="section-header">
         <h2 class="section-title" id="gridSectionTitle">GÜNÜN SON DAKİKA MANŞETLERİ</h2>
         <div class="refresh-pill">
-          <span class="pulse-dot"></span>
-          <span id="lastUpdateText">Canlı Akış Aktif</span>
+          <span class="pulse-dot-green"></span>
+          <span id="lastUpdateText">7/24 Otopilot Entegrasyon Aktif</span>
         </div>
       </div>
 
@@ -1169,7 +1385,7 @@
 
     <!-- SAĞ SÜTUN -->
     <aside class="sidebar">
-      <!-- TAM 90 Resmi Profil Kartı (Yeni Profil Resmi İle) -->
+      <!-- TAM 90 Resmi Profil Kartı -->
       <div class="profile-card">
         <img src="templates/tam90_profile.png" alt="TAM 90 Resmi Profil" class="profile-card-avatar" />
         <div class="profile-card-info">
@@ -1187,17 +1403,17 @@
       </div>
 
       <!-- TFF Resmi Canlı Puan Durumu, Fikstür, Gol Krallığı & Avrupa Ligleri -->
-      <div class="widget-card">
+      <div class="widget-card" id="standingsWidget">
         <div class="widget-title">
           <span>🏆 SÜPER LİG & AVRUPA MERKEZİ</span>
-          <span id="tffLiveBadge" style="font-size:10.5px;color:#68e325;font-weight:800;">● TFF RESMİ VERİ</span>
+          <span id="tffLiveBadge" style="font-size:10.5px;color:#68e325;font-weight:800;">● TFF CANLI ENTEGRE</span>
         </div>
 
         <div class="widget-tabs">
-          <button class="w-tab active" onclick="switchStandingsTab('superlig', this)">SÜPER LİG (18)</button>
-          <button class="w-tab" onclick="switchStandingsTab('fixtures', this)">9. HAFTA</button>
-          <button class="w-tab" onclick="switchStandingsTab('scorers', this)">GOL KRALLIĞI</button>
-          <button class="w-tab" onclick="switchStandingsTab('europe', this)">AVRUPA</button>
+          <button class="w-tab active" id="wtab-superlig" onclick="switchStandingsTab('superlig', this)">SÜPER LİG (18)</button>
+          <button class="w-tab" id="wtab-fixtures" onclick="switchStandingsTab('fixtures', this)">9. HAFTA</button>
+          <button class="w-tab" id="wtab-scorers" onclick="switchStandingsTab('scorers', this)">GOL KRALLIĞI</button>
+          <button class="w-tab" id="wtab-europe" onclick="switchStandingsTab('europe', this)">AVRUPA</button>
         </div>
 
         <!-- TAB 1: SÜPER LİG 18 TAKIM TAM PUAN DURUMU -->
@@ -1323,7 +1539,7 @@
     </aside>
   </main>
 
-  <!-- HABER DETAY MODALI -->
+  <!-- HABER DETAY MODALI (MOBİL PAYLAŞ DESTEKLİ) -->
   <div class="modal-backdrop" id="newsModal">
     <div class="modal-box">
       <button class="modal-close" id="modalCloseBtn">&times;</button>
@@ -1338,20 +1554,45 @@
         <p class="modal-text" id="modalDesc"></p>
         <div class="modal-actions">
           <a id="modalSourceLink" href="#" target="_blank" class="btn-gold">Haberin Kaynağına Git ↗</a>
+          <button class="btn-share" id="modalShareBtn">📲 Haberi Paylaş</button>
           <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="ig-btn">
             <img src="templates/tam90_profile.png" alt="@tamdoksanaresmi" />
-            <span>Instagram'da Yorumlara Katıl</span>
+            <span>@tamdoksanaresmi</span>
           </a>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- MOBİL SABİT ALT NAVİGASYON BARI (NATIVE APP DENEYİMİ) -->
+  <nav class="mobile-bottom-nav">
+    <button class="m-nav-item active" onclick="mobileNavGo('news', this)">
+      <span class="m-icon">🏠</span>
+      <span>Manşetler</span>
+    </button>
+    <button class="m-nav-item" onclick="mobileNavGo('superlig', this)">
+      <span class="m-icon">🏆</span>
+      <span>Puan Durumu</span>
+    </button>
+    <button class="m-nav-item" onclick="mobileNavGo('fixtures', this)">
+      <span class="m-icon">⚽</span>
+      <span>Fikstür</span>
+    </button>
+    <button class="m-nav-item" onclick="mobileNavGo('scorers', this)">
+      <span class="m-icon">👟</span>
+      <span>Gol Krallığı</span>
+    </button>
+    <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="m-nav-item">
+      <span class="m-icon">📸</span>
+      <span>Instagram</span>
+    </a>
+  </nav>
+
   <!-- ALT FOOTER -->
   <footer>
     <div class="footer-inner">
       <img src="templates/sponsors_footer.png" alt="AYDESSA & LUSTER CAR" class="footer-sponsors-img" />
-      <p class="footer-copy">© 2026 TAM 90 (@tamdoksanaresmi) — Futbol'a Tutku. TFF Puan Durumu ve Son Dakika Haberleri Anlık Olarak Güncellenmektedir.</p>
+      <p class="footer-copy">© 2026 TAM 90 (@tamdoksanaresmi) — Futbol'a Tutku. TFF Puan Durumu ve Son Dakika Haberleri 7/24 Otopilot Entegrasyonu İle Güncellenmektedir.</p>
     </div>
   </footer>
 
@@ -1359,7 +1600,7 @@
     // TFF 2026-2027 (Adnan Süvari Sezonu) 9. Hafta Resmi Puan Cetveli
     let OFFICIAL_STANDINGS = [
       { rank: 1, team: "Galatasaray", played: 8, won: 6, drawn: 1, lost: 1, gf: 17, ga: 11, gd: 6, points: 19 },
-      { rank: 2, team: "Amed Sportif Faaliyetler", played: 8, won: 5, drawn: 2, lost: 1, gf: 18, ga: 9, gd: 9, points: 17 },
+      { rank: 2, team: "Amed SF", played: 8, won: 5, drawn: 2, lost: 1, gf: 18, ga: 9, gd: 9, points: 17 },
       { rank: 3, team: "Fenerbahçe", played: 8, won: 5, drawn: 1, lost: 2, gf: 22, ga: 6, gd: 16, points: 16 },
       { rank: 4, team: "Trabzonspor", played: 8, won: 5, drawn: 1, lost: 2, gf: 18, ga: 5, gd: 13, points: 16 },
       { rank: 5, team: "Beşiktaş", played: 8, won: 5, drawn: 0, lost: 3, gf: 16, ga: 10, gd: 6, points: 15 },
@@ -1381,22 +1622,22 @@
     // TFF 9. Hafta Resmi Fikstür ve Sonuçlar
     let OFFICIAL_FIXTURES = [
       { date: "23.10.2026", time: "20:00", home: "Corendon Alanyaspor", away: "Kocaelispor", score: "1 - 2", status: "MS" },
-      { date: "24.10.2026", time: "13:30", home: "Eyüpspor", away: "Kasımpaşa", score: null, status: "13:30" },
-      { date: "24.10.2026", time: "16:00", home: "Gaziantep FK", away: "Erzurumspor FK", score: null, status: "16:00" },
-      { date: "24.10.2026", time: "19:00", home: "Samsunspor", away: "Amed Sportif Faaliyetler", score: null, status: "19:00" },
-      { date: "25.10.2026", time: "16:00", home: "Tümosan Konyaspor", away: "Gençlerbirliği", score: null, status: "Pazar 16:00" },
-      { date: "25.10.2026", time: "19:00", home: "Göztepe", away: "Arca Çorum FK", score: null, status: "Pazar 19:00" },
-      { date: "26.10.2026", time: "19:00", home: "Çaykur Rizespor", away: "Trabzonspor", score: null, status: "Pzt 19:00" },
-      { date: "26.10.2026", time: "19:00", home: "Beşiktaş", away: "İstanbul Başakşehir", score: null, status: "Pzt 19:00" },
+      { date: "24.10.2026", time: "13:30", home: "Eyüpspor", away: "Kasımpaşa", score: null, status: "24.10 • 13:30" },
+      { date: "24.10.2026", time: "16:00", home: "Gaziantep FK", away: "Erzurumspor FK", score: null, status: "24.10 • 16:00" },
+      { date: "24.10.2026", time: "19:00", home: "Samsunspor", away: "Amed SF", score: null, status: "24.10 • 19:00" },
+      { date: "25.10.2026", time: "16:00", home: "Tümosan Konyaspor", away: "Gençlerbirliği", score: null, status: "25.10 • 16:00" },
+      { date: "25.10.2026", time: "19:00", home: "Göztepe", away: "Arca Çorum FK", score: null, status: "25.10 • 19:00" },
+      { date: "26.10.2026", time: "19:00", home: "Çaykur Rizespor", away: "Trabzonspor", score: null, status: "26.10 • 19:00" },
+      { date: "26.10.2026", time: "19:00", home: "Beşiktaş", away: "İstanbul Başakşehir", score: null, status: "26.10 • 19:00" },
       { date: "26.10.2026", time: "21:30", home: "Galatasaray", away: "Fenerbahçe", score: null, status: "🔥 DERBİ 21:30", isDerby: true }
     ];
 
     // TFF 2026-2027 Resmi Gol Krallığı
-    const OFFICIAL_SCORERS = [
+    let OFFICIAL_SCORERS = [
       { rank: 1, player: "Mohamed Salah", team: "Trabzonspor", goals: 8 },
       { rank: 2, player: "Vedat Muriqi", team: "Fenerbahçe", goals: 7 },
       { rank: 3, player: "Eldor Shomurodov", team: "İstanbul Başakşehir", goals: 7 },
-      { rank: 4, player: "Gift Orban", team: "Amed Sportif Faaliyetler", goals: 7 },
+      { rank: 4, player: "Gift Orban", team: "Amed SF", goals: 7 },
       { rank: 5, player: "Victor Osimhen", team: "Galatasaray", goals: 6 },
       { rank: 6, player: "Dusan Vlahovic", team: "Beşiktaş", goals: 6 },
       { rank: 7, player: "Adrian Benedyczak", team: "Kasımpaşa", goals: 5 },
@@ -1405,7 +1646,7 @@
       { rank: 10, player: "Mason Greenwood", team: "Fenerbahçe", goals: 4 }
     ];
 
-    // Güncel Gerçek Son Dakika Haberleri (24 Ekim 2026)
+    // Güncel Gerçek Son Dakika Haberleri
     const INITIAL_ARTICLES = [
       {
         title: "Galatasaray dev Fenerbahçe derbisinin hazırlıklarına başladı!",
@@ -1486,6 +1727,7 @@
     let currentHeroIndex = 0;
     let heroInterval = null;
     let activeCategory = 'ALL';
+    let currentModalArticle = null;
 
     function renderStandingsTable() {
       const tbody = document.getElementById('superLigTableBody');
@@ -1517,7 +1759,7 @@
       const container = document.getElementById('fixturesListContainer');
       if (!container) return;
       container.innerHTML = OFFICIAL_FIXTURES.map(f => {
-        const isDerby = f.isDerby || (f.home.includes('Galatasaray') && f.away.includes('Fenerbahçe'));
+        const isDerby = f.isDerby || (f.home.toLowerCase().includes('galatasaray') && f.away.toLowerCase().includes('fenerbahçe'));
         const badgeHtml = f.score
           ? `<span class="fixture-score">${f.score}</span>`
           : `<span class="fixture-time" style="${isDerby ? 'background:#e50914;color:#fff;' : ''}">${f.status || f.time}</span>`;
@@ -1552,29 +1794,63 @@
         if (el) el.style.display = t === tabName ? 'block' : 'none';
       });
       document.querySelectorAll('.w-tab').forEach(b => b.classList.remove('active'));
-      if (btnEl) btnEl.classList.add('active');
+      if (btnEl) {
+        btnEl.classList.add('active');
+      } else {
+        const targetBtn = document.getElementById('wtab-' + tabName);
+        if (targetBtn) targetBtn.classList.add('active');
+      }
     }
 
+    function mobileNavGo(section, navBtn) {
+      document.querySelectorAll('.m-nav-item').forEach(b => b.classList.remove('active'));
+      if (navBtn) navBtn.classList.add('active');
+
+      if (section === 'news') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      switchStandingsTab(section);
+      const widget = document.getElementById('standingsWidget');
+      if (widget) {
+        widget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function applyStandingsPayload(data) {
+      if (!data) return;
+      if (Array.isArray(data.standings) && data.standings.length >= 15) {
+        OFFICIAL_STANDINGS = data.standings;
+        renderStandingsTable();
+      }
+      if (Array.isArray(data.fixtures) && data.fixtures.length >= 5) {
+        OFFICIAL_FIXTURES = data.fixtures;
+        renderFixturesList();
+      }
+      if (Array.isArray(data.scorers) && data.scorers.length >= 5) {
+        OFFICIAL_SCORERS = data.scorers;
+        renderScorersTable();
+      }
+      if (data.updatedAt) {
+        document.getElementById('tffLiveBadge').textContent = `● TFF CANLI (${data.updatedAt})`;
+      }
+    }
+
+    // Katmanlı Canlı Puan Durumu Entegrasyonu (Node.js -> PHP/cPanel)
     async function fetchLiveStandings() {
-      try {
-        const res = await fetch('/api/standings');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data && Array.isArray(data.standings) && data.standings.length >= 15) {
-          OFFICIAL_STANDINGS = data.standings;
-          renderStandingsTable();
-        }
-        if (data && Array.isArray(data.fixtures) && data.fixtures.length >= 5) {
-          OFFICIAL_FIXTURES = data.fixtures.map(f => ({
-            ...f,
-            isDerby: f.home.includes('GALATASARAY') && f.away.includes('FENERBAHÇE')
-          }));
-          renderFixturesList();
-        }
-        if (data && data.updatedAt) {
-          document.getElementById('tffLiveBadge').textContent = `● TFF CANLI (${data.updatedAt})`;
-        }
-      } catch (e) {}
+      const endpoints = ['/api/standings', 'api.php?type=standings'];
+      for (const ep of endpoints) {
+        try {
+          const res = await fetch(ep, { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && Array.isArray(data.standings) && data.standings.length >= 15) {
+              applyStandingsPayload(data);
+              return;
+            }
+          }
+        } catch (e) {}
+      }
     }
 
     function detectCategory(title, summary) {
@@ -1590,7 +1866,7 @@
     function renderHero(index) {
       const top5 = filteredArticles.slice(0, 5);
       if (!top5.length) return;
-      currentHeroIndex = index % top5.length;
+      currentHeroIndex = (index + top5.length) % top5.length;
       const item = top5[currentHeroIndex];
 
       document.getElementById('heroImg').src = item.image;
@@ -1616,9 +1892,28 @@
       heroInterval = setInterval(() => renderHero(currentHeroIndex + 1), 6000);
     }
 
+    // Mobil Parmakla Kaydırma (Touch Swipe) Desteği
+    (function enableTouchSwipe() {
+      const slideEl = document.getElementById('heroSlide');
+      let startX = 0;
+      let startY = 0;
+      slideEl.addEventListener('touchstart', e => {
+        startX = e.changedTouches[0].screenX;
+        startY = e.changedTouches[0].screenY;
+      }, { passive: true });
+      slideEl.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].screenX - startX;
+        const dy = e.changedTouches[0].screenY - startY;
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) selectHero(currentHeroIndex + 1);
+          else selectHero(currentHeroIndex - 1);
+        }
+      }, { passive: true });
+    })();
+
     function renderGrid() {
       const gridEl = document.getElementById('newsGrid');
-      const list = filteredArticles.slice(0, 24);
+      const list = filteredArticles.slice(0, 28);
       const fallbackImg = 'https://im.haberturk.com/l/2026/10/23/ver1792757508/3922039/jpg/1920x1080';
       gridEl.innerHTML = list.map((item, idx) => `
         <article class="news-card" onclick="openModalByIndex(${idx})">
@@ -1631,7 +1926,7 @@
             <h3 class="card-headline">${item.title}</h3>
             <p class="card-desc">${item.summary || item.title}</p>
             <div class="card-footer">
-              <span>TAM 90 HABER MERKEZİ</span>
+              <span>TAM 90 CANLI HABER</span>
               <span>Detayları Oku →</span>
             </div>
           </div>
@@ -1649,7 +1944,7 @@
 
     function renderTickerAndTrending() {
       const tickerEl = document.getElementById('tickerContainer');
-      tickerEl.innerHTML = allArticles.slice(0, 12).map((item, idx) => `
+      tickerEl.innerHTML = allArticles.slice(0, 14).map((item, idx) => `
         <span class="ticker-item" onclick="openModalByGlobalIndex(${idx})">
           <span class="time">${item.category}</span> ${item.title}
         </span>
@@ -1677,6 +1972,7 @@
     }
 
     function openModal(item) {
+      currentModalArticle = item;
       document.getElementById('modalImg').src = item.image;
       document.getElementById('modalCat').textContent = item.category;
       document.getElementById('modalTime').textContent = item.timeAgo || 'Son Dakika';
@@ -1685,6 +1981,19 @@
       document.getElementById('modalSourceLink').href = item.link || 'https://www.instagram.com/tamdoksanaresmi/';
       document.getElementById('newsModal').classList.add('open');
     }
+
+    document.getElementById('modalShareBtn').onclick = async () => {
+      if (!currentModalArticle) return;
+      const shareData = {
+        title: `TAM 90 | ${currentModalArticle.title}`,
+        text: `${currentModalArticle.title} — ${currentModalArticle.summary}`,
+        url: currentModalArticle.link || window.location.href
+      };
+      if (navigator.share) {
+        try { await navigator.share(shareData); return; } catch (e) {}
+      }
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareData.title + '\n' + shareData.url)}`, '_blank');
+    };
 
     function openModalByIndex(idx) {
       if (filteredArticles[idx]) openModal(filteredArticles[idx]);
@@ -1714,28 +2023,62 @@
 
     document.getElementById('searchInput').addEventListener('input', applyFilter);
 
+    function applyNewsPayload(data) {
+      if (!Array.isArray(data) || !data.length) return false;
+      allArticles = data.map((art, i) => ({
+        ...art,
+        category: art.category || detectCategory(art.title || '', art.summary || ''),
+        timeAgo: art.timeAgo || (i === 0 ? 'Az Önce' : `${i * 2 + 1} dk önce`)
+      }));
+      applyFilter();
+      renderTickerAndTrending();
+      const now = new Date();
+      document.getElementById('lastUpdateText').textContent =
+        `Canlı Entegrasyon: ${now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
+      return true;
+    }
+
+    // 3 Katmanlı Otopilot Canlı Haber Entegrasyonu (1: Node/Render API, 2: PHP/cPanel API, 3: Tarayıcı İçi Doğrudan RSS)
     async function fetchLiveNews() {
-      try {
-        const res = await fetch('/api/news');
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          allArticles = data.map((art, i) => ({
-            ...art,
-            category: art.category || detectCategory(art.title || '', art.summary || ''),
-            timeAgo: art.timeAgo || (i === 0 ? 'Az Önce' : `${i * 3 + 2} dk önce`)
-          }));
-          applyFilter();
-          renderTickerAndTrending();
-          const now = new Date();
-          document.getElementById('lastUpdateText').textContent =
-            `Son Güncelleme: ${now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
-        }
-      } catch (e) {
-        // Dosya olarak doğrudan açıldığında da güncel kalması için varsayılan saat göstergesi
-        const now = new Date();
-        document.getElementById('lastUpdateText').textContent =
-          `Güncel Akış (${now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })})`;
+      const backendEndpoints = ['/api/news', 'api.php?type=news'];
+      for (const ep of backendEndpoints) {
+        try {
+          const res = await fetch(ep, { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            if (applyNewsPayload(data)) return;
+          }
+        } catch (e) {}
       }
+
+      // Katman 3: Sunucusuz/Statik ortamda doğrudan RSS2JSON köprüsüyle canlı haber çek
+      try {
+        const rssUrl = encodeURIComponent('https://www.haberturk.com/rss/spor.xml');
+        const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json && Array.isArray(json.items) && json.items.length > 0) {
+            const mapped = json.items
+              .filter(it => it.title && (it.enclosure?.link || it.thumbnail))
+              .map((it, idx) => ({
+                title: it.title,
+                summary: (it.description || it.title).replace(/<[^>]+>/g, '').trim(),
+                image: it.enclosure?.link || it.thumbnail,
+                link: it.link,
+                timeAgo: idx < 2 ? 'Az Önce' : `${idx * 3 + 1} dk önce`
+              }));
+            applyNewsPayload(mapped);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Sunucu tarafından gömülen sıfır gecikmeli verileri yükle
+    if (window.__PRELOADED_STANDINGS) {
+      applyStandingsPayload(window.__PRELOADED_STANDINGS);
+    }
+    if (window.__PRELOADED_NEWS && window.__PRELOADED_NEWS.length) {
+      applyNewsPayload(window.__PRELOADED_NEWS);
     }
 
     renderStandingsTable();
@@ -1745,9 +2088,10 @@
     renderTickerAndTrending();
     fetchLiveNews();
     fetchLiveStandings();
+
     heroInterval = setInterval(() => renderHero(currentHeroIndex + 1), 6000);
-    setInterval(fetchLiveNews, 60000);
-    setInterval(fetchLiveStandings, 120000);
+    setInterval(fetchLiveNews, 60000);       // Her 60 saniyede bir son dakika haber güncellemesi
+    setInterval(fetchLiveStandings, 120000); // Her 2 dakikada bir TFF puan durumu ve fikstür güncellemesi
   </script>
 </body>
 </html>
