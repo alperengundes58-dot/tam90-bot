@@ -12,7 +12,7 @@ from pathlib import Path
 
 import requests
 import feedparser
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter, ImageChops
 from instagrapi import Client
 from instagrapi.exceptions import TwoFactorRequired, ChallengeRequired
 
@@ -331,15 +331,14 @@ def format_football_headline(title):
     else:
         return f"{words[0]} {words[1]}", f"{words[2]} {words[3]} !"
 
-# 8. Ultra 4K (2160x2700 Supersampled) Tam Doksan Tasarım Motoru
-def render_tall_grunge_line(text, target_w, color_top, color_bot, font_path, seed):
-    # Yüksek çözünürlüklü geçici katmanda çizip dikey 1.28x uzatarak (İsmail Yüksek / YeniAçık stili) oluşturur
-    base_size = 240
+# 8. Ultra 4K (2160x2700 Supersampled) Tam Doksan Tasarım Motoru ("GALATASARAY'DA / KAOS" İtalik & Çatlak Kaya Stili)
+def render_kaos_single_line(text, target_w, is_yellow_cracked, font_path):
+    base_size = 330 if is_yellow_cracked else 245
     font = ImageFont.truetype(font_path, base_size)
     dummy = Image.new("RGBA", (10, 10))
     d_draw = ImageDraw.Draw(dummy)
 
-    while base_size > 90:
+    while base_size > 95:
         font = ImageFont.truetype(font_path, base_size)
         bbox = d_draw.textbbox((0, 0), text, font=font)
         if (bbox[2] - bbox[0]) <= target_w:
@@ -349,64 +348,129 @@ def render_tall_grunge_line(text, target_w, color_top, color_bot, font_path, see
     bbox = d_draw.textbbox((0, 0), text, font=font)
     tw = bbox[2] - bbox[0]
     th = bbox[3] - bbox[1]
-    pad = 40
+    pad_x = 90
+    pad_y = 55
 
-    layer_w = tw + pad * 2
-    layer_h = th + pad * 2
+    layer_w = tw + pad_x * 2
+    layer_h = th + pad_y * 2
+    ox = pad_x - bbox[0]
+    oy = pad_y - bbox[1]
 
-    # 1. İnce keskin siyah dış kontur katmanı (3px)
-    stroke_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
-    s_draw = ImageDraw.Draw(stroke_layer)
-    ox = pad - bbox[0]
-    oy = pad - bbox[1]
-    for dx in range(-4, 5):
-        for dy in range(-4, 5):
-            if dx * dx + dy * dy <= 16:
-                s_draw.text((ox + dx, oy + dy), text, font=font, fill=(0, 0, 0, 255))
-
-    # 2. Harf maskesi ve iç dolgu
+    # 1. Harf Maskesi
     mask = Image.new("L", (layer_w, layer_h), 0)
     m_draw = ImageDraw.Draw(mask)
     m_draw.text((ox, oy), text, font=font, fill=255)
 
-    fill_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
-    f_draw = ImageDraw.Draw(fill_layer)
+    # 2. Ön Yüz Gradyanı (Üst Satır: Pürüzsüz Metalik Beyaz / Alt Satır: Altın Sarısı + Çatlak Kaya Dokusu)
+    fill_rgb = Image.new("RGB", (layer_w, layer_h), (0, 0, 0))
+    f_draw = ImageDraw.Draw(fill_rgb)
     for y in range(layer_h):
-        t = max(0.0, min(1.0, (y - pad) / max(1, th)))
-        r = int(color_top[0] * (1 - t) + color_bot[0] * t)
-        g = int(color_top[1] * (1 - t) + color_bot[1] * t)
-        b = int(color_top[2] * (1 - t) + color_bot[2] * t)
-        f_draw.line([(0, y), (layer_w, y)], fill=(r, g, b, 255))
+        t = max(0.0, min(1.0, (y - pad_y) / max(1, th)))
+        if not is_yellow_cracked:
+            # Pürüzsüz Metalik Beyaz (#FFFFFF -> #C6C6C6)
+            if t < 0.55:
+                st = t / 0.55
+                c = int(255 * (1 - st) + 242 * st)
+            else:
+                st = (t - 0.55) / 0.45
+                c = int(242 * (1 - st) + 196 * st)
+            f_draw.line([(0, y), (layer_w, y)], fill=(c, c, c))
+        else:
+            # Zengin Altın Sarısı / Kehribar (#FFF000 -> #FFD000 -> #FF9A00)
+            if t < 0.5:
+                st = t / 0.5
+                r = 255
+                g = int(240 * (1 - st) + 208 * st)
+                b = 0
+            else:
+                st = (t - 0.5) / 0.5
+                r = 255
+                g = int(208 * (1 - st) + 154 * st)
+                b = 0
+            f_draw.line([(0, y), (layer_w, y)], fill=(r, g, b))
 
-    # 3. Harflerin içine hafif grunge / eskitme dokusu (İsmail Yüksek görselindeki gibi)
-    rng = random.Random(seed)
-    for _ in range(420):
-        gx = rng.randint(pad, layer_w - pad)
-        gy = rng.randint(pad + int(th * 0.25), pad + th)
-        gw = rng.randint(2, 7)
-        gh = rng.randint(2, 8)
-        f_draw.rectangle([gx, gy, gx + gw, gy + gh], fill=(14, 14, 14, 215))
+    # Alt satıra gerçekçi çatlak kaya dokusu (crackle_texture.png) uygula
+    if is_yellow_cracked:
+        crackle_path = Path(__file__).parent / "templates" / "crackle_texture.png"
+        if crackle_path.exists():
+            crackle_img = Image.open(crackle_path).convert("RGB").resize((layer_w, layer_h), Image.Resampling.LANCZOS)
+            fill_rgb = ImageChops.multiply(fill_rgb, crackle_img)
 
-    textured_text = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
-    textured_text.paste(fill_layer, (0, 0), mask)
+    face_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
+    face_layer.paste(fill_rgb.convert("RGBA"), (0, 0), mask)
 
-    combined = Image.alpha_composite(stroke_layer, textured_text)
+    # 3. 3D Siyah Blok Derinlik (Extrusion) + Kalın Keskin Kontur
+    ext_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
+    e_draw = ImageDraw.Draw(ext_layer)
+    # Dış kontur
+    for dx in range(-9, 10):
+        for dy in range(-9, 10):
+            if dx * dx + dy * dy <= 81:
+                e_draw.text((ox + dx, oy + dy), text, font=font, fill=(0, 0, 0, 255))
+    # 3D alt-sol/alt blok gölge
+    for d in range(1, 15):
+        sx = int(-d * 0.4)
+        sy = int(d * 1.15)
+        e_draw.text((ox + sx, oy + sy), text, font=font, fill=(0, 0, 0, 255))
+        for bx in (-6, 0, 6):
+            e_draw.text((ox + sx + bx, oy + sy), text, font=font, fill=(0, 0, 0, 255))
 
-    # 4. Dikey 1.28x esnetme (Tam spor manşeti proporsiyonu)
-    stretched_h = int(layer_h * 1.28)
+    combined = Image.alpha_composite(ext_layer, face_layer)
+
+    # 4. Dikey Esnetme + İtalik Eğim (GALATASARAY'DA / KAOS İtalik Kesim)
+    scale_y = 1.18 if is_yellow_cracked else 1.24
+    stretched_h = int(layer_h * scale_y)
     stretched = combined.resize((layer_w, stretched_h), Image.Resampling.LANCZOS)
 
-    # 5. Yumuşak ve derin stadyum gölgesi (Gaussian Blur)
-    shadow_alpha = stretched.split()[3]
-    shadow_blur = shadow_alpha.filter(ImageFilter.GaussianBlur(radius=14))
-    shadow_img = Image.new("RGBA", stretched.size, (0, 0, 0, 0))
-    black_solid = Image.new("RGBA", stretched.size, (0, 0, 0, 235))
-    shadow_img.paste(black_solid, (0, 0), shadow_blur)
+    shear = 0.14
+    new_w = stretched.width + int(stretched.height * shear)
+    sheared = stretched.transform(
+        (new_w, stretched.height),
+        Image.Transform.AFFINE,
+        (1, shear, -stretched.height * shear * 0.5, 0, 1, 0),
+        resample=Image.Resampling.BICUBIC
+    )
 
-    final_line = Image.new("RGBA", (stretched.width + 24, stretched.height + 24), (0, 0, 0, 0))
-    final_line.paste(shadow_img, (12, 18), shadow_img)
-    final_line.paste(stretched, (12, 6), stretched)
-    return final_line
+    # 5. Yumuşak Stadyum Drop Shadow
+    shadow_alpha = sheared.split()[3]
+    shadow_blur = shadow_alpha.filter(ImageFilter.GaussianBlur(radius=16))
+    shadow_img = Image.new("RGBA", sheared.size, (0, 0, 0, 0))
+    shadow_img.paste(Image.new("RGBA", sheared.size, (0, 0, 0, 240)), (0, 0), shadow_blur)
+
+    out = Image.new("RGBA", (sheared.width + 24, sheared.height + 28), (0, 0, 0, 0))
+    out.paste(shadow_img, (12, 20), shadow_img)
+    out.paste(sheared, (12, 4), sheared)
+    return out
+
+def render_kaos_headline_block(line1, line2, font_path):
+    block_w, block_h = 2160, 980
+    block = Image.new("RGBA", (block_w, block_h), (0, 0, 0, 0))
+
+    # 1. Alt satırın arkasına sarı diyagonal fırça darbeleri (yellow_slashes.png)
+    slashes_path = Path(__file__).parent / "templates" / "yellow_slashes.png"
+    if slashes_path.exists():
+        slashes_img = Image.open(slashes_path).convert("RGBA").resize((2160, 620), Image.Resampling.LANCZOS)
+        block.paste(slashes_img, (0, 320), slashes_img)
+
+    # 2. Üst Satır (Metalik Beyaz) ve Alt Satır (Çatlak Kaya Sarı)
+    line1_img = render_kaos_single_line(line1, 1840, False, font_path)
+    line2_img = render_kaos_single_line(line2, 1840, True, font_path)
+
+    overlap_gap = -52
+    total_h = line1_img.height + line2_img.height + overlap_gap
+    y1 = (block_h - total_h) // 2
+    y2 = y1 + line1_img.height + overlap_gap
+
+    x1 = (block_w - line1_img.width) // 2
+    x2 = (block_w - line2_img.width) // 2
+
+    # Önce alt satırı, üstüne hafif binen üst satırı (veya üstten alta) birleştir
+    block.paste(line1_img, (x1, y1), line1_img)
+    block.paste(line2_img, (x2, y2), line2_img)
+
+    # 3. Hafif yukarı doğru dinamik açı (+2.0 derece)
+    rotated = block.rotate(2.0, resample=Image.Resampling.BICUBIC, expand=False)
+    return rotated
 
 def generate_tam90_post(raw_image_path, title, output_path):
     # 2160 x 2700 GERÇEK 4K SUPERSAMPLED TUVAL
@@ -468,23 +532,13 @@ def generate_tam90_post(raw_image_path, title, output_path):
         footer_resized = footer_img.resize((W, footer_h), Image.Resampling.LANCZOS)
         canvas.paste(footer_resized, (0, H - footer_h), footer_resized)
 
-    # 5. Uzun, Tok, Grunge Spor Manşeti (Anton-Regular + 1.28x Dikey Stretch)
+    # 5. GALATASARAY'DA / KAOS Stili İtalik & Çatlak Kaya Manşet Bloğu
     line1, line2 = format_football_headline(title)
     font_path = str(Path(__file__).parent / "templates" / "Anton-Regular.ttf")
 
-    line1_img = render_tall_grunge_line(line1, 1940, (255, 255, 255), (235, 235, 235), font_path, 101)
-    line2_img = render_tall_grunge_line(line2, 1940, (255, 212, 0), (255, 180, 0), font_path, 202)
-
-    # Alt şablonun hemen üstüne sıkıca istifle
-    overlap_gap = -38
-    total_h = line1_img.height + line2_img.height + overlap_gap
-    y_start = (H - footer_h - 10) - total_h
-
-    x1 = (W - line1_img.width) // 2
-    x2 = (W - line2_img.width) // 2
-
-    canvas.paste(line1_img, (x1, y_start), line1_img)
-    canvas.paste(line2_img, (x2, y_start + line1_img.height + overlap_gap), line2_img)
+    headline_block = render_kaos_headline_block(line1, line2, font_path)
+    y_start = (H - footer_h + 25) - headline_block.height
+    canvas.paste(headline_block, (0, y_start), headline_block)
 
     final_rgb = canvas.convert("RGB")
     final_rgb.save(output_path, "JPEG", quality=98, subsampling=0)
@@ -569,20 +623,11 @@ def generate_tam90_story(raw_image_path, title, output_path):
         footer_resized = footer_img.resize((W, footer_h), Image.Resampling.LANCZOS)
         canvas.paste(footer_resized, (0, H - footer_h), footer_resized)
 
-    # 6. Uzun, Tok, Grunge Spor Manşeti
+    # 6. GALATASARAY'DA / KAOS Stili İtalik & Çatlak Kaya Manşet Bloğu
     line1, line2 = format_football_headline(title)
-    line1_img = render_tall_grunge_line(line1, 1940, (255, 255, 255), (235, 235, 235), font_path, 301)
-    line2_img = render_tall_grunge_line(line2, 1940, (255, 212, 0), (255, 180, 0), font_path, 402)
-
-    overlap_gap = -38
-    total_h = line1_img.height + line2_img.height + overlap_gap
-    y_start = (H - footer_h - 30) - total_h
-
-    x1 = (W - line1_img.width) // 2
-    x2 = (W - line2_img.width) // 2
-
-    canvas.paste(line1_img, (x1, y_start), line1_img)
-    canvas.paste(line2_img, (x2, y_start + line1_img.height + overlap_gap), line2_img)
+    headline_block = render_kaos_headline_block(line1, line2, font_path)
+    y_start = (H - footer_h + 10) - headline_block.height
+    canvas.paste(headline_block, (0, y_start), headline_block)
 
     final_rgb = canvas.convert("RGB")
     final_rgb.save(output_path, "JPEG", quality=98, subsampling=0)
