@@ -39,6 +39,10 @@
 
     html {
       scroll-behavior: smooth;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden !important;
+      overscroll-behavior-x: none;
     }
 
     body {
@@ -49,26 +53,46 @@
       color: var(--text-main);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.5;
-      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden !important;
+      overscroll-behavior-x: none;
+      position: relative;
+      touch-action: pan-y;
     }
 
-    /* 1. SON DAKİKA CANLI BANT (TICKER) */
+    .main-container,
+    .left-column,
+    .sidebar,
+    .navbar,
+    .category-bar,
+    .match-strip-bar,
+    .breaking-bar,
+    .hero-showcase,
+    .widget-card,
+    .profile-card,
+    .news-card {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    /* 1. SON DAKİKA CANLI BANT (SARI - LACİVERT TICKER) */
     .breaking-bar {
-      background: linear-gradient(90deg, #b80000 0%, #e50914 50%, #990000 100%);
+      background: linear-gradient(90deg, #061539 0%, #0d2a6e 50%, #05112e 100%);
       height: 38px;
       display: flex;
       align-items: center;
       overflow: hidden;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      border-bottom: 2px solid var(--gold);
       position: relative;
       z-index: 100;
     }
 
     .breaking-label {
       background: var(--gold);
-      color: #000;
+      color: #061539;
       font-family: 'Chakra Petch', sans-serif;
-      font-weight: 800;
+      font-weight: 900;
       font-style: italic;
       font-size: 12.5px;
       letter-spacing: 0.8px;
@@ -78,14 +102,14 @@
       align-items: center;
       gap: 7px;
       flex-shrink: 0;
-      box-shadow: 6px 0 18px rgba(0, 0, 0, 0.45);
+      box-shadow: 6px 0 18px rgba(0, 0, 0, 0.55);
       z-index: 2;
     }
 
     .pulse-dot {
       width: 8px;
       height: 8px;
-      background: #e50914;
+      background: #061539;
       border-radius: 50%;
       animation: pulse 1.2s infinite;
       flex-shrink: 0;
@@ -228,7 +252,8 @@
 
     .search-box {
       position: relative;
-      width: 260px;
+      width: 310px;
+      z-index: 120;
     }
 
     .search-box input {
@@ -236,15 +261,16 @@
       background: #161a26;
       border: 1px solid var(--border);
       color: #fff;
-      padding: 9px 14px 9px 36px;
+      padding: 9px 34px 9px 36px;
       border-radius: 10px;
-      font-size: 13px;
+      font-size: 13.5px;
       outline: none;
-      transition: border 0.2s;
+      transition: border 0.2s, box-shadow 0.2s;
     }
 
     .search-box input:focus {
       border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(255, 212, 0, 0.14);
     }
 
     .search-box svg {
@@ -255,6 +281,73 @@
       width: 16px;
       height: 16px;
       color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      color: #fff;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 12px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #111520;
+      border: 1px solid var(--border-gold);
+      border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.85);
+      max-height: 410px;
+      overflow-y: auto;
+      display: none;
+      z-index: 400;
+      padding: 8px;
+    }
+
+    .search-dropdown.open {
+      display: block;
+    }
+
+    .s-group-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      padding: 6px 8px 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+
+    .s-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-size: 12.5px;
+      color: #fff;
+    }
+
+    .s-item:hover {
+      background: rgba(255, 212, 0, 0.1);
     }
 
     .ig-btn {
@@ -1181,6 +1274,9 @@
         flex: 1;
         width: 100%;
       }
+      .search-box input {
+        font-size: 16px;
+      }
       .category-container {
         padding: 0 12px;
       }
@@ -1204,8 +1300,9 @@
         bottom: 56px;
       }
       .hero-title {
-        font-size: clamp(21px, 6vw, 30px);
-        transform: skewX(-3deg);
+        font-size: clamp(20px, 5.6vw, 29px);
+        transform: none;
+        word-break: break-word;
       }
       .hero-summary {
         font-size: 12.5px;
@@ -1280,9 +1377,11 @@
       </a>
 
       <div class="search-and-social">
-        <div class="search-box">
+        <div class="search-box" id="searchBoxWrap">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          <input type="text" id="searchInput" placeholder="Takım, futbolcu veya son dakika ara..." />
+          <input type="search" id="searchInput" autocomplete="off" placeholder="Takım, futbolcu veya son dakika ara..." />
+          <button type="button" class="search-clear-btn" id="searchClearBtn" title="Temizle">✕</button>
+          <div class="search-dropdown" id="searchDropdown"></div>
         </div>
       </div>
     </div>
@@ -1911,10 +2010,45 @@
       }, { passive: true });
     })();
 
+    function normTr(str) {
+      if (!str) return '';
+      return str
+        .toLocaleLowerCase('tr-TR')
+        .replace(/ı/g, 'i')
+        .replace(/ğ/g, 'g')
+        .replace(/ü/g, 'u')
+        .replace(/ş/g, 's')
+        .replace(/ö/g, 'o')
+        .replace(/ç/g, 'c')
+        .trim();
+    }
+
+    function clearSearch() {
+      const inp = document.getElementById('searchInput');
+      inp.value = '';
+      document.getElementById('searchClearBtn').style.display = 'none';
+      document.getElementById('searchDropdown').classList.remove('open');
+      applyFilter();
+    }
+
     function renderGrid() {
       const gridEl = document.getElementById('newsGrid');
+      const qRaw = document.getElementById('searchInput').value.trim();
       const list = filteredArticles.slice(0, 28);
       const fallbackImg = 'https://im.haberturk.com/l/2026/10/23/ver1792757508/3922039/jpg/1920x1080';
+
+      if (list.length === 0 && qRaw) {
+        gridEl.innerHTML = `
+          <div style="grid-column: 1 / -1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 32px 20px; text-align: center;">
+            <div style="font-size: 28px; margin-bottom: 8px;">🔍</div>
+            <div style="font-weight: 800; font-size: 16px; color: #fff; margin-bottom: 6px;">"${qRaw}" ile ilgili son dakika haberi bulunamadı</div>
+            <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Puan durumu, fikstür veya gol krallığı sonuçları için arama kutusundaki listeye tıklayabilirsiniz.</div>
+            <button onclick="clearSearch()" class="btn-gold">Tüm Haberleri Göster</button>
+          </div>
+        `;
+        return;
+      }
+
       gridEl.innerHTML = list.map((item, idx) => `
         <article class="news-card" onclick="openModalByIndex(${idx})">
           <div class="card-img-wrap">
@@ -1959,16 +2093,110 @@
       `).join('');
     }
 
+    function renderSearchDropdown(qRaw, qNorm) {
+      const dd = document.getElementById('searchDropdown');
+      if (!qNorm) {
+        dd.classList.remove('open');
+        dd.innerHTML = '';
+        return;
+      }
+
+      const matchedTeams = OFFICIAL_STANDINGS.filter(t => normTr(t.team).includes(qNorm)).slice(0, 4);
+      const matchedScorers = OFFICIAL_SCORERS.filter(s => normTr(s.player + ' ' + s.team).includes(qNorm)).slice(0, 4);
+      const matchedFixtures = OFFICIAL_FIXTURES.filter(f => normTr(f.home + ' ' + f.away).includes(qNorm)).slice(0, 3);
+      const matchedNews = allArticles
+        .map((a, idx) => ({ ...a, globalIdx: idx }))
+        .filter(a => normTr(a.title + ' ' + a.summary + ' ' + a.category).includes(qNorm))
+        .slice(0, 5);
+
+      let html = '';
+
+      if (matchedTeams.length) {
+        html += `<div class="s-group-title">🏆 Süper Lig Puan Durumu</div>`;
+        html += matchedTeams.map(t => `
+          <div class="s-item" onclick="goToStandingsFromSearch('superlig')">
+            <span><strong>#${t.rank} ${t.team}</strong> (${t.played} Maç, AV: ${t.gd >= 0 ? '+' + t.gd : t.gd})</span>
+            <span style="color:var(--gold);font-weight:900;">${t.points} P</span>
+          </div>
+        `).join('');
+      }
+
+      if (matchedFixtures.length) {
+        html += `<div class="s-group-title">⚽ 9. Hafta Maç & Fikstür</div>`;
+        html += matchedFixtures.map(f => `
+          <div class="s-item" onclick="goToStandingsFromSearch('fixtures')">
+            <span>${f.home} - ${f.away}</span>
+            <span style="color:#68e325;font-weight:800;">${f.score || f.status}</span>
+          </div>
+        `).join('');
+      }
+
+      if (matchedScorers.length) {
+        html += `<div class="s-group-title">👟 Gol Krallığı</div>`;
+        html += matchedScorers.map(s => `
+          <div class="s-item" onclick="goToStandingsFromSearch('scorers')">
+            <span><strong>${s.player}</strong> (${s.team})</span>
+            <span style="color:var(--gold);font-weight:900;">${s.goals} Gol</span>
+          </div>
+        `).join('');
+      }
+
+      if (matchedNews.length) {
+        html += `<div class="s-group-title">📰 Son Dakika Haberleri (${matchedNews.length})</div>`;
+        html += matchedNews.map(n => `
+          <div class="s-item" onclick="openModalByGlobalIndex(${n.globalIdx}); document.getElementById('searchDropdown').classList.remove('open');">
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:82%;">${n.title}</span>
+            <span style="color:var(--gold);font-size:11px;font-weight:800;">Oku →</span>
+          </div>
+        `).join('');
+      }
+
+      if (!html) {
+        html = `<div style="padding:12px;text-align:center;color:var(--text-muted);font-size:12.5px;">"${qRaw}" için eşleşen kayıt bulunamadı.</div>`;
+      }
+
+      dd.innerHTML = html;
+      dd.classList.add('open');
+    }
+
+    function goToStandingsFromSearch(tabName) {
+      document.getElementById('searchDropdown').classList.remove('open');
+      switchStandingsTab(tabName);
+      const w = document.getElementById('standingsWidget');
+      if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function applyFilter() {
-      const q = document.getElementById('searchInput').value.trim().toLowerCase();
-      filteredArticles = allArticles.filter(item => {
-        const matchCat = activeCategory === 'ALL' || item.category === activeCategory;
-        const matchQ = !q || (item.title + ' ' + item.summary).toLowerCase().includes(q);
-        return matchCat && matchQ;
-      });
-      if (!filteredArticles.length) filteredArticles = allArticles;
-      renderHero(0);
+      const qRaw = document.getElementById('searchInput').value.trim();
+      const qNorm = normTr(qRaw);
+      const clearBtn = document.getElementById('searchClearBtn');
+      const heroSec = document.getElementById('heroSection');
+      const titleEl = document.getElementById('gridSectionTitle');
+
+      if (clearBtn) clearBtn.style.display = qRaw.length > 0 ? 'flex' : 'none';
+
+      if (qNorm.length > 0) {
+        filteredArticles = allArticles.filter(item =>
+          normTr(item.title + ' ' + item.summary + ' ' + item.category).includes(qNorm)
+        );
+        if (heroSec) heroSec.style.display = 'none';
+        if (titleEl) titleEl.textContent = `🔍 "${qRaw.toUpperCase()}" ARAMA SONUÇLARI (${filteredArticles.length})`;
+      } else {
+        filteredArticles = allArticles.filter(item =>
+          activeCategory === 'ALL' || item.category === activeCategory
+        );
+        if (!filteredArticles.length) filteredArticles = allArticles;
+        if (heroSec) heroSec.style.display = 'block';
+        if (titleEl) {
+          titleEl.textContent = activeCategory === 'ALL'
+            ? 'GÜNÜN SON DAKİKA MANŞETLERİ'
+            : `${activeCategory} SON DAKİKA HABERLERİ`;
+        }
+        renderHero(0);
+      }
+
       renderGrid();
+      renderSearchDropdown(qRaw, qNorm);
     }
 
     function openModal(item) {
@@ -2022,6 +2250,25 @@
     });
 
     document.getElementById('searchInput').addEventListener('input', applyFilter);
+    document.getElementById('searchInput').addEventListener('focus', () => {
+      const qRaw = document.getElementById('searchInput').value.trim();
+      if (qRaw) renderSearchDropdown(qRaw, normTr(qRaw));
+    });
+    document.getElementById('searchInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('searchDropdown').classList.remove('open');
+        const gridEl = document.getElementById('gridSectionTitle');
+        if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+    document.getElementById('searchClearBtn').onclick = clearSearch;
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('searchBoxWrap');
+      if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('searchDropdown').classList.remove('open');
+      }
+    });
 
     function applyNewsPayload(data) {
       if (!Array.isArray(data) || !data.length) return false;
