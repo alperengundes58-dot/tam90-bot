@@ -86,6 +86,14 @@ class HealthHandler(http.server.SimpleHTTPRequestHandler):
             threading.Thread(target=execute_post, args=(code,)).start()
             return
 
+        if parsed.path in ['/story-now', '/api/story-now']:
+            self.send_response(200)
+            self.send_header("Content-type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok", "message": "Ultra 4K Story Paylaşımı Tetiklendi!"}).encode("utf-8"))
+            threading.Thread(target=execute_story).start()
+            return
+
         if parsed.path == '/post-approved':
             self.send_response(200)
             self.send_header("Content-type", "application/json; charset=utf-8")
@@ -274,7 +282,7 @@ def tr_upper(text):
 
 def format_football_headline(title):
     clean = re.sub(r'^(FLAŞ|SON DAKİKA|ÖZEL HABER|ÖZEL|HABER|TRANSFER|RESMİ AÇIKLAMA|RESMİ|VİDEO)\s*[:|-]\s*', '', title, flags=re.I).strip()
-    clean = clean.replace('"', '').replace("'", "").replace("’", "").replace("“", "").replace("”", "").strip()
+    clean = clean.replace('"', '').replace("’", "'").replace("“", "").replace("”", "").strip()
     clean = clean.rstrip('.!')
     lower = clean.lower()
 
@@ -482,6 +490,104 @@ def generate_tam90_post(raw_image_path, title, output_path):
     final_rgb.save(output_path, "JPEG", quality=98, subsampling=0)
     log(f"✨ 2160x2700 Ultra 4K Tam Doksan görseli hazırlandı: {output_path}")
 
+def generate_tam90_story(raw_image_path, title, output_path):
+    # 2160 x 3840 (9:16 GERÇEK 4K STORY TUVALİ)
+    W, H = 2160, 3840
+    footer_h = 448
+    photo_h = H - footer_h + 40
+
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 255))
+
+    # 1. Basın Fotoğrafını 9:16 4K Yerleştir ve Keskinleştir
+    raw_img = Image.open(raw_image_path).convert("RGBA")
+    img_ratio = raw_img.width / raw_img.height
+    target_ratio = W / photo_h
+
+    if img_ratio > target_ratio:
+        scale_h = photo_h
+        scale_w = int(photo_h * img_ratio)
+    else:
+        scale_w = W
+        scale_h = int(W / img_ratio)
+
+    resized_photo = raw_img.resize((scale_w, scale_h), Image.Resampling.LANCZOS)
+    left = (scale_w - W) // 2
+    top = int((scale_h - photo_h) * 0.15)
+    cropped_photo = resized_photo.crop((left, top, left + W, top + photo_h))
+
+    rgb_photo = cropped_photo.convert("RGB")
+    rgb_photo = rgb_photo.filter(ImageFilter.UnsharpMask(radius=1.8, percent=135, threshold=3))
+    rgb_photo = ImageEnhance.Contrast(rgb_photo).enhance(1.08)
+    rgb_photo = ImageEnhance.Color(rgb_photo).enhance(1.12)
+    canvas.paste(rgb_photo.convert("RGBA"), (0, 0))
+
+    # 2. Üst ve Alt Sinematik Degrade
+    top_grad_h = 560
+    top_col = Image.new("L", (1, top_grad_h))
+    for y in range(top_grad_h):
+        t = 1.0 - (y / top_grad_h)
+        top_col.putpixel((0, y), int(200 * (t ** 1.5)))
+    top_mask = top_col.resize((W, top_grad_h), Image.Resampling.BILINEAR)
+    canvas.paste(Image.new("RGBA", (W, top_grad_h), (0, 0, 0, 255)), (0, 0), top_mask)
+
+    grad_h = 1650
+    grad_y = (H - footer_h) - grad_h
+    grad_col = Image.new("L", (1, grad_h))
+    for y in range(grad_h):
+        t = y / grad_h
+        grad_col.putpixel((0, y), int(255 * (t ** 1.55)))
+    grad_mask = grad_col.resize((W, grad_h), Image.Resampling.BILINEAR)
+    canvas.paste(Image.new("RGBA", (W, grad_h), (0, 0, 0, 255)), (0, grad_y), grad_mask)
+
+    # 3. Sol Üst TAM90 Logosu (Story üst barının hemen altında güvenli alanda)
+    logo_path = Path(__file__).parent / "templates" / "tam90_logo.png"
+    if logo_path.exists():
+        logo_img = Image.open(logo_path).convert("RGBA")
+        logo_w = 520
+        logo_h = int(logo_img.height * (logo_w / logo_img.width))
+        logo_resized = logo_img.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
+        canvas.paste(logo_resized, (76, 176), logo_resized)
+
+    # 4. Sağ Üst "SON DAKİKA" Kırmızı Rozet
+    font_path = str(Path(__file__).parent / "templates" / "Anton-Regular.ttf")
+    badge_w, badge_h = 430, 116
+    badge_x, badge_y = W - badge_w - 76, 206
+    badge = Image.new("RGBA", (badge_w, badge_h), (0, 0, 0, 0))
+    b_draw = ImageDraw.Draw(badge)
+    b_draw.rounded_rectangle([0, 0, badge_w - 1, badge_h - 1], radius=18, fill=(220, 12, 20, 255), outline=(255, 255, 255, 90), width=4)
+    badge_font = ImageFont.truetype(font_path, 70)
+    bb = b_draw.textbbox((0, 0), "SON DAKİKA", font=badge_font)
+    bx = (badge_w - (bb[2] - bb[0])) // 2 - bb[0]
+    by = (badge_h - (bb[3] - bb[1])) // 2 - bb[1]
+    b_draw.text((bx, by), "SON DAKİKA", font=badge_font, fill=(255, 255, 255, 255))
+    canvas.paste(badge, (badge_x, badge_y), badge)
+
+    # 5. Birebir Alt Sponsor Şablonu (AYDESSA + SOSYAL MEDYA + LUSTER CAR)
+    footer_path = Path(__file__).parent / "templates" / "sponsors_footer.png"
+    if footer_path.exists():
+        footer_img = Image.open(footer_path).convert("RGBA")
+        footer_resized = footer_img.resize((W, footer_h), Image.Resampling.LANCZOS)
+        canvas.paste(footer_resized, (0, H - footer_h), footer_resized)
+
+    # 6. Uzun, Tok, Grunge Spor Manşeti
+    line1, line2 = format_football_headline(title)
+    line1_img = render_tall_grunge_line(line1, 1940, (255, 255, 255), (235, 235, 235), font_path, 301)
+    line2_img = render_tall_grunge_line(line2, 1940, (255, 212, 0), (255, 180, 0), font_path, 402)
+
+    overlap_gap = -38
+    total_h = line1_img.height + line2_img.height + overlap_gap
+    y_start = (H - footer_h - 30) - total_h
+
+    x1 = (W - line1_img.width) // 2
+    x2 = (W - line2_img.width) // 2
+
+    canvas.paste(line1_img, (x1, y_start), line1_img)
+    canvas.paste(line2_img, (x2, y_start + line1_img.height + overlap_gap), line2_img)
+
+    final_rgb = canvas.convert("RGB")
+    final_rgb.save(output_path, "JPEG", quality=98, subsampling=0)
+    log(f"✨ 2160x3840 Ultra 4K Story görseli hazırlandı: {output_path}")
+
 # 9. Futbol Sayfasına Özel Viral Müzik
 def get_viral_football_track():
     queries = ["drill beat", "turkce drill", "football phonk", "stadium anthem", "hype drill"]
@@ -580,13 +686,45 @@ def execute_post(two_factor_code=None):
     else:
         log("Giriş yapılamadığı için görsel yüklenemedi.")
 
-# 11. 7/24 Kesintisiz Döngü (10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00)
+def execute_story():
+    log("Ultra 4K Story paylaşım süreci başladı...")
+    title, summary, img_url = get_live_headline_and_photo()
+    log(f"Story için seçilen haber: {title}")
+
+    raw_path = Path(__file__).parent / "temp_story_raw.jpg"
+    final_story_path = Path(__file__).parent / "temp_story_ready.jpg"
+
+    try:
+        r = requests.get(img_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
+        with open(raw_path, "wb") as f:
+            f.write(r.content)
+    except Exception as e:
+        log(f"Story görsel indirme hatası: {e}")
+        return
+
+    generate_tam90_story(raw_path, title, final_story_path)
+
+    if login_instagram():
+        try:
+            log("Ultra 4K Story Instagram'a yükleniyor...")
+            story_media = cl.photo_upload_to_story(final_story_path)
+            log(f"🎉🎉 STORY YAYINDA! Story ID: {story_media.pk}")
+        except Exception as e:
+            log(f"Story yükleme hatası: {type(e).__name__} - {e}")
+    else:
+        log("Giriş yapılamadığı için Story yüklenemedi.")
+
+# 11. 7/24 Kesintisiz Döngü
+# Gönderi Saatleri: 10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00
+# Story Saatleri (Öğlen 12'den Gece 12'ye 3 Saatte Bir): 12:00, 15:00, 18:00, 21:00, 00:00
 if __name__ == "__main__":
     threading.Thread(target=lambda: socketserver.TCPServer(("", PORT), HealthHandler).serve_forever(), daemon=True).start()
     log(f"Web sunucusu {PORT} portunda dinliyor...")
 
     TARGET_HOURS = [10, 12, 15, 17, 20, 22, 0]
+    STORY_HOURS = [12, 15, 18, 21, 0]
     posted_today = set()
+    story_posted_today = set()
 
     while True:
         now = time.localtime(time.time() + 3 * 3600)  # Türkiye Saati (UTC+3)
@@ -601,7 +739,15 @@ if __name__ == "__main__":
             except Exception as e:
                 log(f"Zamanlanmış paylaşım hatası: {e}")
 
-        if hour == 0 and minute == 5:
-            posted_today.clear()
+        if hour in STORY_HOURS and minute == 2 and slot_key not in story_posted_today:
+            story_posted_today.add(slot_key)
+            try:
+                execute_story()
+            except Exception as e:
+                log(f"Zamanlanmış Story hatası: {e}")
 
-        time.sleep(30)
+        if hour == 0 and minute == 10:
+            posted_today.clear()
+            story_posted_today.clear()
+
+        time.sleep(25)
