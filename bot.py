@@ -86,6 +86,14 @@ class HealthHandler(http.server.SimpleHTTPRequestHandler):
             threading.Thread(target=execute_post, args=(code,)).start()
             return
 
+        if parsed.path == '/post-approved':
+            self.send_response(200)
+            self.send_header("Content-type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok", "message": "Onaylanan 4K Ronaldo Görseli Yükleniyor!"}).encode("utf-8"))
+            threading.Thread(target=execute_approved_post).start()
+            return
+
         self.send_response(200)
         self.send_header("Content-type", "text/plain; charset=utf-8")
         self.end_headers()
@@ -490,6 +498,40 @@ def get_viral_football_track():
     return None
 
 # 10. Gönderi Paylaşım Fonksiyonu
+def execute_approved_post():
+    log("Onaylanan 4K Ronaldo görseli paylaşılıyor...")
+    approved_path = Path(__file__).parent / "templates" / "approved_ronaldo_4k.jpg"
+    if not approved_path.exists():
+        log("Hata: approved_ronaldo_4k.jpg bulunamadı!")
+        return
+
+    title = "Cristiano Ronaldo durdurulamıyor! 982. golünü attı"
+    summary = (
+        "Suudi Arabistan Pro Ligi'nde Al-Nassr forması giyen Portekizli dünya yıldızı Cristiano Ronaldo, "
+        "takımının galibiyetinde başrol oynayarak kariyerinin 982. golüne imza attı ve 1000 gol hedefine bir adım daha yaklaştı."
+    )
+    save_posted_title(title)
+    caption = generate_smart_caption(title, summary)
+
+    if login_instagram():
+        uploaded = False
+        try:
+            track = get_viral_football_track()
+            if track:
+                log(f"Onaylı 4K görsel '{track.title}' müziğiyle yükleniyor...")
+                media = cl.photo_upload_with_music(approved_path, caption=caption, track=track)
+                log(f"🎉🎉 HARİKA! Müzikli 4K gönderi yayında: https://www.instagram.com/p/{media.code}/")
+                uploaded = True
+        except Exception as music_err:
+            log(f"Müzikli yükleme atlandı ({music_err}), standart 4K yükleniyor...")
+
+        if not uploaded:
+            try:
+                media = cl.photo_upload(approved_path, caption)
+                log(f"🎉🎉 BAŞARILI! 4K gönderi yayında: https://www.instagram.com/p/{media.code}/")
+            except Exception as e:
+                log(f"Upload hatası: {type(e).__name__} - {e}")
+
 def execute_post(two_factor_code=None):
     log("Viral gönderi süreci başladı...")
     title, summary, img_url = get_live_headline_and_photo()
