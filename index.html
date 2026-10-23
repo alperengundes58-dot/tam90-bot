@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TAM 90 | Futbol'a Tutku — Son Dakika Spor & Futbol Haberleri</title>
+  <title>TAM 90 | Futbol'a Tutku — Canlı Puan Durumu, Fikstür & Son Dakika Spor</title>
+  <link rel="icon" type="image/png" href="templates/tam90_profile.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&family=Chakra+Petch:ital,wght@0,600;0,700;1,700&display=swap" rel="stylesheet">
@@ -14,6 +15,7 @@
       --bg-card-hover: #171b28;
       --bg-glass: rgba(16, 19, 28, 0.86);
       --gold: #FFD400;
+      --neon-green: #68e325;
       --gold-dark: #FFA800;
       --red: #E50914;
       --text-main: #FFFFFF;
@@ -31,8 +33,8 @@
     body {
       background-color: var(--bg-dark);
       background-image:
-        radial-gradient(circle at 15% 0%, rgba(255, 212, 0, 0.07) 0%, transparent 45%),
-        radial-gradient(circle at 85% 10%, rgba(229, 9, 20, 0.06) 0%, transparent 40%);
+        radial-gradient(circle at 15% 0%, rgba(104, 227, 37, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 85% 10%, rgba(255, 212, 0, 0.06) 0%, transparent 40%);
       color: var(--text-main);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.5;
@@ -94,7 +96,7 @@
       display: inline-block;
       white-space: nowrap;
       padding-left: 100%;
-      animation: ticker 38s linear infinite;
+      animation: ticker 42s linear infinite;
     }
 
     .ticker-move:hover {
@@ -125,9 +127,9 @@
       100% { transform: translate3d(-100%, 0, 0); }
     }
 
-    /* 2. ÜST NAVBAR & LOGO */
+    /* 2. ÜST NAVBAR & YENİ PROFİL RESMİ */
     .navbar {
-      background: rgba(10, 12, 18, 0.92);
+      background: rgba(10, 12, 18, 0.94);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       position: sticky;
@@ -136,9 +138,9 @@
     }
 
     .nav-container {
-      max-width: 1340px;
+      max-width: 1380px;
       margin: 0 auto;
-      padding: 14px 24px;
+      padding: 12px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -149,12 +151,26 @@
     .brand-box {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       text-decoration: none;
     }
 
+    .brand-profile-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 18px rgba(104, 227, 37, 0.45);
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .brand-box:hover .brand-profile-avatar {
+      transform: scale(1.06);
+    }
+
     .brand-logo {
-      height: 54px;
+      height: 48px;
       width: auto;
       filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
     }
@@ -221,22 +237,32 @@
     }
 
     .ig-btn {
-      background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+      background: linear-gradient(135deg, #121722 0%, #1c2436 100%);
+      border: 1px solid rgba(104, 227, 37, 0.45);
       color: #fff;
       text-decoration: none;
       font-weight: 700;
       font-size: 13px;
-      padding: 9px 16px;
-      border-radius: 8px;
+      padding: 6px 14px 6px 8px;
+      border-radius: 30px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 15px rgba(253, 29, 29, 0.3);
-      transition: transform 0.2s;
+      gap: 9px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s;
+    }
+
+    .ig-btn img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     .ig-btn:hover {
       transform: translateY(-2px);
+      border-color: var(--gold);
+      box-shadow: 0 6px 18px rgba(104, 227, 37, 0.28);
     }
 
     /* 3. KATEGORİ SEKMELERİ */
@@ -246,7 +272,7 @@
     }
 
     .category-container {
-      max-width: 1340px;
+      max-width: 1380px;
       margin: 0 auto;
       padding: 0 24px;
       display: flex;
@@ -289,15 +315,15 @@
 
     /* 4. ANA İÇERİK DÜZENİ */
     .main-container {
-      max-width: 1340px;
-      margin: 26px auto;
+      max-width: 1380px;
+      margin: 24px auto;
       padding: 0 24px;
       display: grid;
-      grid-template-columns: 1fr 350px;
-      gap: 28px;
+      grid-template-columns: 1fr 410px;
+      gap: 26px;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 1080px) {
       .main-container {
         grid-template-columns: 1fr;
       }
@@ -393,10 +419,9 @@
       font-weight: 600;
     }
 
-    /* TAM 90 KAOS STİLİ MANŞET BAŞLIĞI */
     .hero-title {
       font-family: 'Anton', Impact, sans-serif;
-      font-size: clamp(28px, 4vw, 48px);
+      font-size: clamp(28px, 3.8vw, 46px);
       line-height: 1.08;
       letter-spacing: 0.8px;
       text-transform: uppercase;
@@ -404,11 +429,6 @@
       text-shadow: 0 6px 22px rgba(0, 0, 0, 0.95), 2px 4px 0 #000;
       margin-bottom: 10px;
       transform: skewX(-6deg);
-    }
-
-    .hero-title span.highlight {
-      color: var(--gold);
-      display: inline-block;
     }
 
     .hero-summary {
@@ -421,7 +441,6 @@
       overflow: hidden;
     }
 
-    /* Manşet Numaralı Geçiş Barı (1 - 5) */
     .hero-tabs {
       position: absolute;
       bottom: 0;
@@ -529,7 +548,7 @@
 
     .news-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
       gap: 20px;
     }
 
@@ -604,7 +623,7 @@
 
     .card-headline {
       font-weight: 800;
-      font-size: 16px;
+      font-size: 15.5px;
       line-height: 1.35;
       color: #fff;
       margin-bottom: 9px;
@@ -641,11 +660,79 @@
       color: var(--gold);
     }
 
-    /* 7. SAĞ SÜTUN (CANLI MAÇLAR + PUAN DURUMU + INSTAGRAM KARTI) */
+    /* 7. SAĞ SÜTUN (PROFİL KARTI + CANLI PUAN DURUMU/FİKSTÜR/GOL KRALLIĞI) */
     .sidebar {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 22px;
+    }
+
+    .profile-card {
+      background: linear-gradient(145deg, #101520 0%, #0b0e15 100%);
+      border: 1px solid rgba(104, 227, 37, 0.35);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .profile-card-avatar {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 0 22px rgba(104, 227, 37, 0.4);
+    }
+
+    .profile-card-info {
+      flex: 1;
+    }
+
+    .profile-card-handle {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .verified-dot {
+      background: var(--neon-green);
+      color: #000;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    .profile-card-bio {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: 4px 0 10px;
+      line-height: 1.4;
+    }
+
+    .profile-follow-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(90deg, #52b714 0%, #68e325 100%);
+      color: #000;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .profile-follow-btn:hover {
+      opacity: 0.9;
     }
 
     .widget-card {
@@ -657,11 +744,11 @@
 
     .widget-title {
       font-family: 'Chakra Petch', sans-serif;
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 800;
       font-style: italic;
       color: var(--gold);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -669,63 +756,155 @@
       padding-bottom: 10px;
     }
 
+    .widget-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      background: #0b0d14;
+      padding: 5px;
+      border-radius: 9px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .w-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 7px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .w-tab.active {
+      background: var(--gold);
+      color: #000;
+    }
+
     /* Puan Durumu Tablosu */
     .standings-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 12.2px;
     }
 
     .standings-table th {
-      text-align: left;
+      text-align: center;
       color: var(--text-muted);
       font-weight: 700;
-      padding: 7px 6px;
+      padding: 6px 3px;
       border-bottom: 1px solid var(--border);
-      font-size: 11.5px;
+      font-size: 10.5px;
+    }
+
+    .standings-table th:nth-child(2),
+    .standings-table td:nth-child(2) {
+      text-align: left;
+      padding-left: 6px;
     }
 
     .standings-table td {
-      padding: 9px 6px;
+      padding: 7px 3px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       font-weight: 600;
+      text-align: center;
     }
 
     .standings-table tr:hover {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.04);
     }
 
     .rank-num {
       display: inline-flex;
-      width: 22px;
-      height: 22px;
+      width: 21px;
+      height: 21px;
       border-radius: 5px;
       align-items: center;
       justify-content: center;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 800;
       background: #1c2130;
+      color: #cbd5e1;
     }
 
-    .rank-1, .rank-2 {
+    .rank-1 {
       background: var(--gold);
       color: #000;
+    }
+
+    .rank-2 {
+      background: #68e325;
+      color: #000;
+    }
+
+    .rank-3, .rank-4 {
+      background: #38bdf8;
+      color: #000;
+    }
+
+    .rank-rel {
+      background: rgba(229, 9, 20, 0.25);
+      color: #ff6b6b;
+      border: 1px solid rgba(229, 9, 20, 0.4);
     }
 
     .pts-col {
       color: var(--gold);
       font-weight: 800 !important;
-      text-align: right;
+      font-size: 13px;
     }
 
-    /* Sponsor & Instagram Banner */
+    .fixture-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: #141824;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .fixture-row.derby {
+      border-color: var(--gold);
+      background: linear-gradient(90deg, rgba(229, 9, 20, 0.14) 0%, rgba(255, 212, 0, 0.14) 100%);
+    }
+
+    .fixture-score {
+      background: var(--gold);
+      color: #000;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 11.5px;
+      min-width: 52px;
+      text-align: center;
+    }
+
+    .fixture-time {
+      background: #1f2637;
+      color: #cbd5e1;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      min-width: 52px;
+      text-align: center;
+    }
+
     .sponsor-banner {
       background: #000;
       border: 1px solid var(--border-gold);
       border-radius: 14px;
       overflow: hidden;
       text-align: center;
-      padding: 14px 10px;
+      padding: 12px 10px;
     }
 
     .sponsor-banner img {
@@ -824,7 +1003,7 @@
       cursor: pointer;
     }
 
-    /* 9. ALT FOOTER (SPONSOR ŞABLONU İLE) */
+    /* 9. ALT FOOTER */
     footer {
       background: #000;
       border-top: 1px solid var(--border);
@@ -862,20 +1041,21 @@
     </div>
     <div class="ticker-wrap">
       <div class="ticker-move" id="tickerContainer">
-        <span class="ticker-item"><span class="time">CANLI</span> TAM 90 Spor Portalı üzerinden anlık son dakika futbol gelişmeleri yükleniyor...</span>
+        <span class="ticker-item"><span class="time">CANLI</span> TAM 90 Spor Portalı üzerinden TFF resmi puan durumu ve anlık futbol gelişmeleri yükleniyor...</span>
       </div>
     </div>
   </div>
 
-  <!-- 2. ÜST NAVBAR -->
+  <!-- 2. ÜST NAVBAR & YENİ PROFİL RESMİ -->
   <header class="navbar">
     <div class="nav-container">
       <a href="/" class="brand-box">
-        <img src="/templates/tam90_logo.png" alt="TAM 90 Logo" class="brand-logo" />
+        <img src="templates/tam90_profile.png" alt="TAM 90 Profil" class="brand-profile-avatar" />
+        <img src="templates/tam90_logo.png" alt="TAM 90 Logo" class="brand-logo" />
         <div class="brand-divider"></div>
         <div class="brand-tagline">
-          <span class="title">SON DAKİKA FUTBOL PORTALI</span>
-          <span class="sub">7/24 Kesintisiz Güncel Spor Haberleri</span>
+          <span class="title">CANLI SKOR, PUAN DURUMU & HABER MERKEZİ</span>
+          <span class="sub">TFF Resmi Verileri ve 7/24 Son Dakika Futbol</span>
         </div>
       </a>
 
@@ -885,7 +1065,8 @@
           <input type="text" id="searchInput" placeholder="Takım, oyuncu veya haber ara..." />
         </div>
         <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="ig-btn">
-          <span>📸 @tamdoksanaresmi</span>
+          <img src="templates/tam90_profile.png" alt="@tamdoksanaresmi" />
+          <span>@tamdoksanaresmi</span>
         </a>
       </div>
     </div>
@@ -899,38 +1080,56 @@
       <button class="cat-btn" data-cat="FENERBAHÇE">🐦 FENERBAHÇE</button>
       <button class="cat-btn" data-cat="BEŞİKTAŞ">🦅 BEŞİKTAŞ</button>
       <button class="cat-btn" data-cat="TRABZONSPOR">🌊 TRABZONSPOR</button>
-      <button class="cat-btn" data-cat="TRANSFER">🔁 TRANSFER MERKEZİ</button>
-      <button class="cat-btn" data-cat="AVRUPA">🌍 AVRUPA & DÜNYA</button>
+      <button class="cat-btn" data-cat="SÜPER LİG">🏆 SÜPER LİG</button>
+      <button class="cat-btn" data-cat="AVRUPA">🌍 AVRUPA & ŞAMPİYONLAR LİGİ</button>
     </div>
   </nav>
 
-  <!-- 3.5 GÜNÜN MAÇLARI & SKOR MERKEZİ -->
+  <!-- 3.5 CANLI MAÇ MERKEZİ (TFF 9. HAFTA & AVRUPA KUPALARI) -->
   <div style="background:#090b11;border-bottom:1px solid var(--border);padding:10px 0;">
-    <div style="max-width:1340px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:14px;overflow-x:auto;scrollbar-width:none;">
-      <span style="font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:12px;color:var(--gold);letter-spacing:1px;white-space:nowrap;padding-right:6px;border-right:1px solid var(--border);">⚽️ MAÇ MERKEZİ</span>
-      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:12.5px;font-weight:700;">
-        <span style="color:#949ab1;font-size:11px;">SÜPER LİG</span>
+    <div id="topMatchStrip" style="max-width:1380px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:12px;overflow-x:auto;scrollbar-width:none;">
+      <span style="font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:12px;color:var(--gold);letter-spacing:1px;white-space:nowrap;padding-right:8px;border-right:1px solid var(--border);">⚽️ 9. HAFTA & AVRUPA</span>
+
+      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+        <span style="color:#68e325;font-size:10.5px;">MS • 9. HAFTA</span>
+        <span>Alanyaspor</span>
+        <span style="background:var(--gold);color:#000;padding:2px 7px;border-radius:4px;font-weight:900;">1 - 2</span>
+        <span>Kocaelispor</span>
+      </div>
+
+      <div style="background:linear-gradient(90deg,rgba(229,9,20,0.18),rgba(255,212,0,0.18));border:1px solid var(--gold);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+        <span style="color:var(--gold);font-size:10.5px;">🔥 26 EKİM 21:30</span>
         <span>Galatasaray</span>
-        <span style="background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:900;">3 - 1</span>
-        <span>Beşiktaş</span>
-      </div>
-      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:12.5px;font-weight:700;">
-        <span style="color:#949ab1;font-size:11px;">SÜPER LİG</span>
+        <span style="background:#e50914;color:#fff;padding:2px 7px;border-radius:4px;font-weight:900;">DERBİ</span>
         <span>Fenerbahçe</span>
-        <span style="background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:900;">2 - 0</span>
-        <span>Bodrum FK</span>
       </div>
-      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:12.5px;font-weight:700;">
-        <span style="color:#949ab1;font-size:11px;">SÜPER LİG</span>
-        <span>Trabzonspor</span>
-        <span style="background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:900;">1 - 0</span>
-        <span>Başakşehir</span>
+
+      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+        <span style="color:#949ab1;font-size:10.5px;">BUGÜN 19:00</span>
+        <span>Samsunspor</span>
+        <span style="background:#1e2638;color:#fff;padding:2px 7px;border-radius:4px;font-weight:800;">v</span>
+        <span>Amed SF</span>
       </div>
-      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 14px;display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:12.5px;font-weight:700;">
-        <span style="color:#e50914;font-size:11px;">AVRUPA</span>
-        <span>Al-Nassr</span>
-        <span style="background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:900;">2 - 1</span>
-        <span>Al-Shabab</span>
+
+      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+        <span style="color:#38bdf8;font-size:10.5px;">UCL • MS</span>
+        <span>Lille</span>
+        <span style="background:var(--gold);color:#000;padding:2px 7px;border-radius:4px;font-weight:900;">2 - 4</span>
+        <span>Galatasaray</span>
+      </div>
+
+      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+        <span style="color:#38bdf8;font-size:10.5px;">UCL • MS</span>
+        <span>Fenerbahçe</span>
+        <span style="background:var(--gold);color:#000;padding:2px 7px;border-radius:4px;font-weight:900;">2 - 2</span>
+        <span>Slavia Prag</span>
+      </div>
+
+      <div style="background:#121622;border:1px solid var(--border);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:12px;font-weight:700;">
+        <span style="color:#fb923c;font-size:10.5px;">UEL • MS</span>
+        <span>Beşiktaş</span>
+        <span style="background:var(--gold);color:#000;padding:2px 7px;border-radius:4px;font-weight:900;">2 - 2</span>
+        <span>Crystal Palace</span>
       </div>
     </div>
   </div>
@@ -941,7 +1140,7 @@
       <!-- DEV MANŞET VİTRİNİ -->
       <section class="hero-showcase" id="heroSection">
         <div class="hero-slide" id="heroSlide">
-          <img id="heroImg" referrerpolicy="no-referrer" onerror="this.src='https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg'" src="https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg" alt="Manşet" />
+          <img id="heroImg" referrerpolicy="no-referrer" onerror="this.src='https://im.haberturk.com/l/2026/10/23/ver1792757508/3922039/jpg/1920x1080'" src="https://im.haberturk.com/l/2026/10/23/ver1792757508/3922039/jpg/1920x1080" alt="Manşet" />
           <div class="hero-gradient"></div>
           <div class="hero-content">
             <div class="hero-badges">
@@ -970,79 +1169,125 @@
 
     <!-- SAĞ SÜTUN -->
     <aside class="sidebar">
-      <!-- Sponsor & Resmi Hesap Kartı -->
-      <div class="sponsor-banner">
-        <img src="/templates/sponsors_footer.png" alt="Tam 90 Resmi Sponsorlar" />
+      <!-- TAM 90 Resmi Profil Kartı (Yeni Profil Resmi İle) -->
+      <div class="profile-card">
+        <img src="templates/tam90_profile.png" alt="TAM 90 Resmi Profil" class="profile-card-avatar" />
+        <div class="profile-card-info">
+          <div class="profile-card-handle">
+            <span>TAM 90</span>
+            <span class="verified-dot">✓ RESMİ</span>
+          </div>
+          <div class="profile-card-bio">
+            <strong>@tamdoksanaresmi</strong> • Futbol'a Tutku! Süper Lig, Avrupa ve Transfer Gündemi 7/24 Canlı.
+          </div>
+          <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="profile-follow-btn">
+            📸 Instagram'da Takip Et ↗
+          </a>
+        </div>
       </div>
 
-      <!-- Süper Lig Puan Durumu -->
+      <!-- TFF Resmi Canlı Puan Durumu, Fikstür, Gol Krallığı & Avrupa Ligleri -->
       <div class="widget-card">
         <div class="widget-title">
-          <span>🏆 SÜPER LİG ZİRVE YARIŞI</span>
-          <span style="font-size:11px;color:#949ab1;">CANLI</span>
+          <span>🏆 SÜPER LİG & AVRUPA MERKEZİ</span>
+          <span id="tffLiveBadge" style="font-size:10.5px;color:#68e325;font-weight:800;">● TFF RESMİ VERİ</span>
         </div>
-        <table class="standings-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>TAKIM</th>
-              <th>O</th>
-              <th>AV</th>
-              <th style="text-align:right;">P</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="rank-num rank-1">1</span></td>
-              <td>Galatasaray</td>
-              <td>9</td>
-              <td>+19</td>
-              <td class="pts-col">25</td>
-            </tr>
-            <tr>
-              <td><span class="rank-num rank-2">2</span></td>
-              <td>Fenerbahçe</td>
-              <td>9</td>
-              <td>+15</td>
-              <td class="pts-col">22</td>
-            </tr>
-            <tr>
-              <td><span class="rank-num">3</span></td>
-              <td>Beşiktaş</td>
-              <td>9</td>
-              <td>+11</td>
-              <td class="pts-col">20</td>
-            </tr>
-            <tr>
-              <td><span class="rank-num">4</span></td>
-              <td>Samsunspor</td>
-              <td>9</td>
-              <td>+6</td>
-              <td class="pts-col">18</td>
-            </tr>
-            <tr>
-              <td><span class="rank-num">5</span></td>
-              <td>Başakşehir</td>
-              <td>9</td>
-              <td>+4</td>
-              <td class="pts-col">15</td>
-            </tr>
-            <tr>
-              <td><span class="rank-num">6</span></td>
-              <td>Trabzonspor</td>
-              <td>9</td>
-              <td>+2</td>
-              <td class="pts-col">13</td>
-            </tr>
-            <tr>
-              <td><span class="rank-num">7</span></td>
-              <td>Göztepe</td>
-              <td>9</td>
-              <td>+3</td>
-              <td class="pts-col">13</td>
-            </tr>
-          </tbody>
-        </table>
+
+        <div class="widget-tabs">
+          <button class="w-tab active" onclick="switchStandingsTab('superlig', this)">SÜPER LİG (18)</button>
+          <button class="w-tab" onclick="switchStandingsTab('fixtures', this)">9. HAFTA</button>
+          <button class="w-tab" onclick="switchStandingsTab('scorers', this)">GOL KRALLIĞI</button>
+          <button class="w-tab" onclick="switchStandingsTab('europe', this)">AVRUPA</button>
+        </div>
+
+        <!-- TAB 1: SÜPER LİG 18 TAKIM TAM PUAN DURUMU -->
+        <div id="tab-superlig">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;display:flex;justify-content:space-between;">
+            <span>2026-2027 Adnan Süvari Sezonu</span>
+            <span id="standingsWeekLabel">9. Hafta Canlı</span>
+          </div>
+          <table class="standings-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>TAKIM</th>
+                <th>O</th>
+                <th>G</th>
+                <th>B</th>
+                <th>M</th>
+                <th>AV</th>
+                <th>P</th>
+              </tr>
+            </thead>
+            <tbody id="superLigTableBody"></tbody>
+          </table>
+          <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;font-size:10.5px;color:var(--text-muted);">
+            <span>🟡 1-2: Şampiyonlar Ligi</span>
+            <span>🔵 3-4: Avrupa Kupaları</span>
+            <span>🔴 16-18: Düşme Hattı</span>
+          </div>
+        </div>
+
+        <!-- TAB 2: 9. HAFTA FİKSTÜR & SONUÇLAR -->
+        <div id="tab-fixtures" style="display:none;">
+          <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:8px;">
+            📅 Trendyol Süper Lig 9. Hafta Programı (23-26 Ekim)
+          </div>
+          <div id="fixturesListContainer"></div>
+        </div>
+
+        <!-- TAB 3: GOL KRALLIĞI -->
+        <div id="tab-scorers" style="display:none;">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
+            👟 TFF Resmi Gol Krallığı Yarışı (2026-2027)
+          </div>
+          <table class="standings-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>OYUNCU / KULÜP</th>
+                <th style="text-align:right;padding-right:6px;">GOL</th>
+              </tr>
+            </thead>
+            <tbody id="scorersTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- TAB 4: AVRUPA LİGLERİ -->
+        <div id="tab-europe" style="display:none;">
+          <div style="font-size:11.5px;font-weight:800;color:var(--gold);margin-bottom:6px;">🇪🇸 İspanya La Liga (2026/27 Zirve)</div>
+          <table class="standings-table" style="margin-bottom:14px;">
+            <thead>
+              <tr><th>#</th><th>TAKIM</th><th>O</th><th>G</th><th>B</th><th>M</th><th>AV</th><th>P</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="rank-num rank-1">1</span></td><td>Barcelona</td><td>9</td><td>9</td><td>0</td><td>0</td><td>+30</td><td class="pts-col">27</td></tr>
+              <tr><td><span class="rank-num rank-2">2</span></td><td>Atlético Madrid</td><td>9</td><td>7</td><td>1</td><td>1</td><td>+11</td><td class="pts-col">22</td></tr>
+              <tr><td><span class="rank-num rank-3">3</span></td><td>Real Madrid</td><td>9</td><td>7</td><td>0</td><td>2</td><td>+14</td><td class="pts-col">21</td></tr>
+              <tr><td><span class="rank-num rank-4">4</span></td><td>Real Betis</td><td>9</td><td>6</td><td>1</td><td>2</td><td>+2</td><td class="pts-col">19</td></tr>
+              <tr><td><span class="rank-num">5</span></td><td>Real Sociedad</td><td>9</td><td>5</td><td>1</td><td>3</td><td>0</td><td class="pts-col">16</td></tr>
+            </tbody>
+          </table>
+
+          <div style="font-size:11.5px;font-weight:800;color:#38bdf8;margin-bottom:6px;">🏴󠁧󠁢󠁥󠁮󠁧󠁿 İngiltere Premier League (2026/27 Zirve)</div>
+          <table class="standings-table">
+            <thead>
+              <tr><th>#</th><th>TAKIM</th><th>O</th><th>G</th><th>B</th><th>M</th><th>AV</th><th>P</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="rank-num rank-1">1</span></td><td>Manchester City</td><td>7</td><td>7</td><td>0</td><td>0</td><td>+15</td><td class="pts-col">21</td></tr>
+              <tr><td><span class="rank-num rank-2">2</span></td><td>Arsenal</td><td>7</td><td>6</td><td>0</td><td>1</td><td>+11</td><td class="pts-col">18</td></tr>
+              <tr><td><span class="rank-num rank-3">3</span></td><td>Brighton</td><td>7</td><td>5</td><td>1</td><td>1</td><td>+7</td><td class="pts-col">16</td></tr>
+              <tr><td><span class="rank-num rank-4">4</span></td><td>Chelsea</td><td>7</td><td>4</td><td>1</td><td>2</td><td>+5</td><td class="pts-col">13</td></tr>
+              <tr><td><span class="rank-num">5</span></td><td>Liverpool</td><td>7</td><td>4</td><td>0</td><td>3</td><td>+4</td><td class="pts-col">12</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sponsor Kartı -->
+      <div class="sponsor-banner">
+        <img src="templates/sponsors_footer.png" alt="Tam 90 Resmi Sponsorlar" />
       </div>
 
       <!-- En Çok Okunanlar -->
@@ -1053,29 +1298,25 @@
         <div id="trendingList" style="display:flex;flex-direction:column;gap:12px;"></div>
       </div>
 
-      <!-- Canlı Taraftar Anketi -->
+      <!-- Canlı Derbi & Şampiyonluk Anketi -->
       <div class="widget-card">
         <div class="widget-title">
-          <span>📊 TARAFTAR ANKETİ</span>
-          <span style="font-size:11px;color:#949ab1;">14.820 OY</span>
+          <span>📊 DEV DERBİ ANKETİ</span>
+          <span style="font-size:11px;color:#949ab1;">28.450 OY</span>
         </div>
-        <p style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:12px;">Sizce bu sezon Süper Lig şampiyonu hangi takım olur?</p>
+        <p style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:12px;">26 Ekim Pazartesi 21:30'daki Galatasaray - Fenerbahçe derbisini kim kazanır?</p>
         <div id="pollContainer" style="display:flex;flex-direction:column;gap:9px;">
           <button onclick="votePoll(0)" style="background:#161a26;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-            <span>🦁 Galatasaray</span>
-            <span style="color:var(--gold);">%44</span>
+            <span>🦁 Galatasaray Kazanır</span>
+            <span style="color:var(--gold);">%46</span>
           </button>
           <button onclick="votePoll(1)" style="background:#161a26;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-            <span>🐦 Fenerbahçe</span>
-            <span style="color:var(--gold);">%39</span>
+            <span>🐦 Fenerbahçe Kazanır</span>
+            <span style="color:var(--gold);">%41</span>
           </button>
           <button onclick="votePoll(2)" style="background:#161a26;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-            <span>🦅 Beşiktaş</span>
-            <span style="color:var(--gold);">%12</span>
-          </button>
-          <button onclick="votePoll(3)" style="background:#161a26;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-            <span>🌊 Trabzonspor</span>
-            <span style="color:var(--gold);">%5</span>
+            <span>🤝 Berabere Biter</span>
+            <span style="color:var(--gold);">%13</span>
           </button>
         </div>
       </div>
@@ -1096,8 +1337,11 @@
         <h2 class="modal-title" id="modalTitle"></h2>
         <p class="modal-text" id="modalDesc"></p>
         <div class="modal-actions">
-          <a id="modalSourceLink" href="#" target="_blank" class="btn-gold">Haberin Tüm Detayları ↗</a>
-          <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="ig-btn">📸 Instagram'da Tartışmaya Katıl</a>
+          <a id="modalSourceLink" href="#" target="_blank" class="btn-gold">Haberin Kaynağına Git ↗</a>
+          <a href="https://www.instagram.com/tamdoksanaresmi/" target="_blank" class="ig-btn">
+            <img src="templates/tam90_profile.png" alt="@tamdoksanaresmi" />
+            <span>Instagram'da Yorumlara Katıl</span>
+          </a>
         </div>
       </div>
     </div>
@@ -1106,52 +1350,134 @@
   <!-- ALT FOOTER -->
   <footer>
     <div class="footer-inner">
-      <img src="/templates/sponsors_footer.png" alt="AYDESSA & LUSTER CAR" class="footer-sponsors-img" />
-      <p class="footer-copy">© 2026 TAM 90 (@tamdoksanaresmi) — Futbol'a Tutku. Tüm Son Dakika Haberleri Anlık Olarak Güncellenmektedir.</p>
+      <img src="templates/sponsors_footer.png" alt="AYDESSA & LUSTER CAR" class="footer-sponsors-img" />
+      <p class="footer-copy">© 2026 TAM 90 (@tamdoksanaresmi) — Futbol'a Tutku. TFF Puan Durumu ve Son Dakika Haberleri Anlık Olarak Güncellenmektedir.</p>
     </div>
   </footer>
 
   <script>
+    // TFF 2026-2027 (Adnan Süvari Sezonu) 9. Hafta Resmi Puan Cetveli
+    let OFFICIAL_STANDINGS = [
+      { rank: 1, team: "Galatasaray", played: 8, won: 6, drawn: 1, lost: 1, gf: 17, ga: 11, gd: 6, points: 19 },
+      { rank: 2, team: "Amed Sportif Faaliyetler", played: 8, won: 5, drawn: 2, lost: 1, gf: 18, ga: 9, gd: 9, points: 17 },
+      { rank: 3, team: "Fenerbahçe", played: 8, won: 5, drawn: 1, lost: 2, gf: 22, ga: 6, gd: 16, points: 16 },
+      { rank: 4, team: "Trabzonspor", played: 8, won: 5, drawn: 1, lost: 2, gf: 18, ga: 5, gd: 13, points: 16 },
+      { rank: 5, team: "Beşiktaş", played: 8, won: 5, drawn: 0, lost: 3, gf: 16, ga: 10, gd: 6, points: 15 },
+      { rank: 6, team: "Kocaelispor", played: 9, won: 5, drawn: 0, lost: 4, gf: 11, ga: 9, gd: 2, points: 15 },
+      { rank: 7, team: "Arca Çorum FK", played: 8, won: 4, drawn: 1, lost: 3, gf: 18, ga: 13, gd: 5, points: 13 },
+      { rank: 8, team: "Kasımpaşa", played: 8, won: 3, drawn: 4, lost: 1, gf: 12, ga: 9, gd: 3, points: 13 },
+      { rank: 9, team: "Corendon Alanyaspor", played: 9, won: 3, drawn: 3, lost: 3, gf: 9, ga: 11, gd: -2, points: 12 },
+      { rank: 10, team: "İstanbul Başakşehir", played: 8, won: 3, drawn: 2, lost: 3, gf: 12, ga: 12, gd: 0, points: 11 },
+      { rank: 11, team: "Erzurumspor FK", played: 8, won: 3, drawn: 2, lost: 3, gf: 5, ga: 11, gd: -6, points: 11 },
+      { rank: 12, team: "Çaykur Rizespor", played: 8, won: 3, drawn: 1, lost: 4, gf: 8, ga: 11, gd: -3, points: 10 },
+      { rank: 13, team: "Göztepe", played: 8, won: 2, drawn: 3, lost: 3, gf: 17, ga: 16, gd: 1, points: 9 },
+      { rank: 14, team: "Gaziantep FK", played: 8, won: 2, drawn: 2, lost: 4, gf: 8, ga: 12, gd: -4, points: 8 },
+      { rank: 15, team: "Gençlerbirliği", played: 8, won: 2, drawn: 2, lost: 4, gf: 7, ga: 16, gd: -9, points: 8 },
+      { rank: 16, team: "Tümosan Konyaspor", played: 8, won: 1, drawn: 2, lost: 5, gf: 4, ga: 9, gd: -5, points: 5 },
+      { rank: 17, team: "Samsunspor", played: 8, won: 1, drawn: 1, lost: 6, gf: 7, ga: 19, gd: -12, points: 4 },
+      { rank: 18, team: "Eyüpspor", played: 8, won: 1, drawn: 0, lost: 7, gf: 2, ga: 22, gd: -20, points: 3 }
+    ];
+
+    // TFF 9. Hafta Resmi Fikstür ve Sonuçlar
+    let OFFICIAL_FIXTURES = [
+      { date: "23.10.2026", time: "20:00", home: "Corendon Alanyaspor", away: "Kocaelispor", score: "1 - 2", status: "MS" },
+      { date: "24.10.2026", time: "13:30", home: "Eyüpspor", away: "Kasımpaşa", score: null, status: "13:30" },
+      { date: "24.10.2026", time: "16:00", home: "Gaziantep FK", away: "Erzurumspor FK", score: null, status: "16:00" },
+      { date: "24.10.2026", time: "19:00", home: "Samsunspor", away: "Amed Sportif Faaliyetler", score: null, status: "19:00" },
+      { date: "25.10.2026", time: "16:00", home: "Tümosan Konyaspor", away: "Gençlerbirliği", score: null, status: "Pazar 16:00" },
+      { date: "25.10.2026", time: "19:00", home: "Göztepe", away: "Arca Çorum FK", score: null, status: "Pazar 19:00" },
+      { date: "26.10.2026", time: "19:00", home: "Çaykur Rizespor", away: "Trabzonspor", score: null, status: "Pzt 19:00" },
+      { date: "26.10.2026", time: "19:00", home: "Beşiktaş", away: "İstanbul Başakşehir", score: null, status: "Pzt 19:00" },
+      { date: "26.10.2026", time: "21:30", home: "Galatasaray", away: "Fenerbahçe", score: null, status: "🔥 DERBİ 21:30", isDerby: true }
+    ];
+
+    // TFF 2026-2027 Resmi Gol Krallığı
+    const OFFICIAL_SCORERS = [
+      { rank: 1, player: "Mohamed Salah", team: "Trabzonspor", goals: 8 },
+      { rank: 2, player: "Vedat Muriqi", team: "Fenerbahçe", goals: 7 },
+      { rank: 3, player: "Eldor Shomurodov", team: "İstanbul Başakşehir", goals: 7 },
+      { rank: 4, player: "Gift Orban", team: "Amed Sportif Faaliyetler", goals: 7 },
+      { rank: 5, player: "Victor Osimhen", team: "Galatasaray", goals: 6 },
+      { rank: 6, player: "Dusan Vlahovic", team: "Beşiktaş", goals: 6 },
+      { rank: 7, player: "Adrian Benedyczak", team: "Kasımpaşa", goals: 5 },
+      { rank: 8, player: "Juan Santos", team: "Göztepe", goals: 5 },
+      { rank: 9, player: "Cengiz Ünder", team: "Arca Çorum FK", goals: 4 },
+      { rank: 10, player: "Mason Greenwood", team: "Fenerbahçe", goals: 4 }
+    ];
+
+    // Güncel Gerçek Son Dakika Haberleri (24 Ekim 2026)
     const INITIAL_ARTICLES = [
       {
-        title: "Cristiano Ronaldo durdurulamıyor! 982. golünü attı",
-        summary: "Suudi Arabistan Pro Ligi'nde Al-Nassr forması giyen Portekizli dünya yıldızı Cristiano Ronaldo, takımının galibiyetinde başrol oynayarak kariyerinin 982. golüne imza attı ve 1000 gol hedefine bir adım daha yaklaştı.",
-        image: "https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg",
-        category: "AVRUPA",
-        timeAgo: "Az Önce",
-        link: "https://www.instagram.com/tamdoksanaresmi/"
-      },
-      {
-        title: "Lille bir Türk'ün daha peşinde! Rota Galatasaray",
-        summary: "Fransa Ligue 1 ekibi Lille, Galatasaray'ın genç yıldızını radarına aldı. Fransız temsilcisinin gözlemcileri İstanbul'a gelerek kritik maçta oyuncuyu tribünden takip etti.",
-        image: "https://cdn.ajansspor.com/ajansspor/photo/2026/10/52d8ad8c-9c22-4e4d-84cc-5a00462e66f6.jpg",
+        title: "Galatasaray dev Fenerbahçe derbisinin hazırlıklarına başladı!",
+        summary: "Trendyol Süper Lig'in 9. haftasında 26 Ekim Pazartesi günü RAMS Park'ta Fenerbahçe'yi ağırlayacak olan lider Galatasaray, teknik direktör Okan Buruk yönetiminde derbi mesaisine başladı. Şampiyonlar Ligi'nde Lille'i deplasmanda 4-2 mağlup eden sarı-kırmızılılarda moraller zirvede.",
+        image: "https://im.haberturk.com/l/2026/10/23/ver1792757508/3922039/jpg/1920x1080",
         category: "GALATASARAY",
-        timeAgo: "6 dk önce",
-        link: "https://www.instagram.com/tamdoksanaresmi/"
+        timeAgo: "Az Önce",
+        link: "https://www.haberturk.com/spor/galatasaray-fenerbahce-derbisi-hazirliklarina-basladi-3922039"
       },
       {
-        title: "Bayern Münih teknik direktörü Vincent Kompany hastaneye kaldırıldı!",
-        summary: "Alman devi Bayern Münih'te teknik direktör Vincent Kompany'nin ani rahatsızlığı sonrası hastaneye kaldırıldığı ve kontrollerinin devam ettiği açıklandı.",
+        title: "Süper Lig'de 9. hafta perdesi açıldı: Kocaelispor Alanya'da 2-1 kazandı!",
+        summary: "Trendyol Süper Lig'de 9. haftanın açılış maçında Corendon Alanyaspor'a konuk olan Kocaelispor, Berkan Kutlu ve Baku'nün golleriyle sahadan 2-1 galip ayrılarak puanını 15'e yükseltti. Teknik direktör Selçuk İnan, 'Hak edilmiş, güzel bir galibiyet aldık' dedi.",
+        image: "https://im.haberturk.com/l/2026/10/23/ver1792781708/3922132/jpg/1920x1080",
+        category: "SÜPER LİG",
+        timeAgo: "4 dk önce",
+        link: "https://www.haberturk.com/spor/alanyaspor-kocaelispor-mac-sonucu-iste-alanya-kocaeli-maci-ozeti-ve-golleri-super-lig-3922132"
+      },
+      {
+        title: "Beşiktaş'ta Fabio Miretti şoku! Başakşehir maçı öncesi iki ihtimal",
+        summary: "UEFA Avrupa Ligi'nde Crystal Palace ile 2-2 berabere kalan Beşiktaş'ta sakatlanan Fabio Miretti'nin sağ omuz-köprücük kemiği bölgesinde yaralanma tespit edildi ve 4-6 hafta sahalardan uzak kalacağı açıklandı. Teknik direktör Vincenzo Italiano, Başakşehir karşısında Ndidi veya Trossard'ı görevlendirecek.",
+        image: "https://im.haberturk.com/l/2026/10/23/ver1792755385/3922024/jpg/1920x1080",
+        category: "BEŞİKTAŞ",
+        timeAgo: "9 dk önce",
+        link: "https://www.haberturk.com/spor/besiktas-crystal-palace-macinda-sakatlanan-fabio-miretti-nin-son-durumu-belli-oldu-4-6-hafta-yok-3922031"
+      },
+      {
+        title: "Bayern Münih Teknik Direktörü Vincent Kompany hastaneye kaldırıldı!",
+        summary: "Alman devi Bayern Münih'te Teknik Direktör Vincent Kompany, altyapı takımının antrenmanını takip ettiği sırada fenalaşarak yere yığıldı. Kulüp, Belçikalı teknik adamın hastaneye kaldırıldığını ve kontrollerinin sürdüğünü duyurdu.",
         image: "https://im.haberturk.com/l/2026/10/23/ver1792775005/3922107/jpg/1920x1080",
         category: "AVRUPA",
-        timeAgo: "12 dk önce",
-        link: "https://www.instagram.com/tamdoksanaresmi/"
+        timeAgo: "14 dk önce",
+        link: "https://www.haberturk.com/spor/bayern-munih-in-teknik-direktoru-kompany-hastaneye-kaldirildi-3922107"
       },
       {
-        title: "Fenerbahçe'de Jose Mourinho'dan derbi ve şampiyonluk mesajı!",
-        summary: "Sarı-lacivertlilerde teknik direktör Jose Mourinho, Samandıra'da oyuncularıyla yaptığı toplantıda zirve yarışında hata payı olmadığını vurguladı.",
-        image: "https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg",
+        title: "Fenerbahçe'den Yunanistan'da 16 sayı geriden gelip dev zafer!",
+        summary: "Fenerbahçe, 7. hafta mücadelesinde konuk olduğu son şampiyon Yunan ekibi Olympiakos'u deplasmanda 16 sayı farktan geri dönerek 64-61 mağlup etti ve Avrupa'da gövde gösterisi yaptı.",
+        image: "https://im.haberturk.com/l/2026/10/23/ver1792787924/3922144/jpg/1920x1080",
         category: "FENERBAHÇE",
         timeAgo: "18 dk önce",
-        link: "https://www.instagram.com/tamdoksanaresmi/"
+        link: "https://www.haberturk.com/spor/olympiakos-fenerbahce-tarfin-mac-sonucu-iste-olympiakos-fenerbahce-maci-ozeti-euroleague-3922144"
       },
       {
-        title: "Beşiktaş'ta flaş gelişme! Yeni transfer çalışmaları hız kazandı",
-        summary: "Siyah-beyazlı yönetim, devre arası transfer dönemi öncesi hücum hattını güçlendirmek için Avrupa'da temaslarını sıklaştırdı.",
-        image: "https://cdn.ajansspor.com/ajansspor/photo/2026/10/52d8ad8c-9c22-4e4d-84cc-5a00462e66f6.jpg",
-        category: "BEŞİKTAŞ",
-        timeAgo: "25 dk önce",
-        link: "https://www.instagram.com/tamdoksanaresmi/"
+        title: "Selçuk İnan: Oyuncularımız planı sahaya eksiksiz yansıttı!",
+        summary: "Kocaelispor Teknik Direktörü Selçuk İnan, Corendon Alanyaspor karşısında aldıkları 2-1’lik deplasman galibiyetinin ardından yaptığı açıklamada hafta boyunca çalıştıkları planı sahaya yansıttıklarını belirtti.",
+        image: "https://im.haberturk.com/l/2026/10/23/ver1792788574/3922145/jpg/1920x1080",
+        category: "SÜPER LİG",
+        timeAgo: "22 dk önce",
+        link: "https://www.haberturk.com/spor/kocaelispor-teknik-direktoru-selcuk-inan-hak-edilmis-guzel-bir-galibiyet-3922145"
+      },
+      {
+        title: "Juventus'ta milli futbolcumuz Zeki Çelik sakatlandı!",
+        summary: "İtalya Serie A devi Juventus forması giyen milli futbolcu Zeki Çelik'in sol arka adalesinde hafif dereceli kas hasarı tespit edildiği açıklandı.",
+        image: "https://im.haberturk.com/l/2026/10/23/ver1792769899/3922091/jpg/1920x1080",
+        category: "AVRUPA",
+        timeAgo: "27 dk önce",
+        link: "https://www.haberturk.com/spor/juventus-ta-zeki-celik-sakatlandi-3922091"
+      },
+      {
+        title: "Fransa'da flaş karar: PSG - Olympique Lyon dev maçı ertelendi!",
+        summary: "Fransa Ligue 1'de Paris Saint-Germain ile Olympique Lyon arasında oynanacak kritik karşılaşma, Fransa'daki olaylar nedeniyle pazar gününden pazartesi gününe ertelendi.",
+        image: "https://im.haberturk.com/l/2026/10/23/ver1792770415/3922093/jpg/1920x1080",
+        category: "AVRUPA",
+        timeAgo: "34 dk önce",
+        link: "https://www.haberturk.com/spor/psg-lyon-maci-fransa-daki-olaylar-nedeniyle-ertelendi-3922093"
+      },
+      {
+        title: "Samsunspor'da Amed SF maçı öncesi açıklama: Bu zor durumdan çıkacağız",
+        summary: "Trendyol Süper Lig'in 9. haftasında sahasında lig ikincisi Amed Sportif Faaliyetler'i konuk edecek Samsunspor'da teknik direktör Nenad Bjelica, taraftarın desteğiyle çıkışa geçeceklerini söyledi.",
+        image: "https://im.haberturk.com/l/2026/10/23/ver1792762033/3922062/jpg/1920x1080",
+        category: "SÜPER LİG",
+        timeAgo: "41 dk önce",
+        link: "https://www.haberturk.com/spor/nenad-bjelica-bu-zor-durumdan-cikacagiz-3922062"
       }
     ];
 
@@ -1161,14 +1487,103 @@
     let heroInterval = null;
     let activeCategory = 'ALL';
 
+    function renderStandingsTable() {
+      const tbody = document.getElementById('superLigTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = OFFICIAL_STANDINGS.map(row => {
+        let rankClass = '';
+        if (row.rank === 1) rankClass = 'rank-1';
+        else if (row.rank === 2) rankClass = 'rank-2';
+        else if (row.rank === 3 || row.rank === 4) rankClass = 'rank-3';
+        else if (row.rank >= 16) rankClass = 'rank-rel';
+
+        const gdFormatted = row.gd > 0 ? `+${row.gd}` : `${row.gd}`;
+        return `
+          <tr>
+            <td><span class="rank-num ${rankClass}">${row.rank}</span></td>
+            <td style="font-weight:700;color:#fff;">${row.team}</td>
+            <td>${row.played}</td>
+            <td>${row.won}</td>
+            <td>${row.drawn}</td>
+            <td>${row.lost}</td>
+            <td style="color:${row.gd >= 0 ? '#68e325' : '#f87171'};">${gdFormatted}</td>
+            <td class="pts-col">${row.points}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderFixturesList() {
+      const container = document.getElementById('fixturesListContainer');
+      if (!container) return;
+      container.innerHTML = OFFICIAL_FIXTURES.map(f => {
+        const isDerby = f.isDerby || (f.home.includes('Galatasaray') && f.away.includes('Fenerbahçe'));
+        const badgeHtml = f.score
+          ? `<span class="fixture-score">${f.score}</span>`
+          : `<span class="fixture-time" style="${isDerby ? 'background:#e50914;color:#fff;' : ''}">${f.status || f.time}</span>`;
+        return `
+          <div class="fixture-row ${isDerby ? 'derby' : ''}">
+            <span style="flex:1;text-align:right;padding-right:8px;">${f.home}</span>
+            ${badgeHtml}
+            <span style="flex:1;text-align:left;padding-left:8px;">${f.away}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderScorersTable() {
+      const tbody = document.getElementById('scorersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = OFFICIAL_SCORERS.map(s => `
+        <tr>
+          <td><span class="rank-num ${s.rank <= 2 ? 'rank-1' : ''}">${s.rank}</span></td>
+          <td>
+            <div style="font-weight:800;color:#fff;">${s.player}</div>
+            <div style="font-size:10.5px;color:var(--text-muted);">${s.team}</div>
+          </td>
+          <td class="pts-col" style="text-align:right;padding-right:8px;">${s.goals} Gol</td>
+        </tr>
+      `).join('');
+    }
+
+    function switchStandingsTab(tabName, btnEl) {
+      ['superlig', 'fixtures', 'scorers', 'europe'].forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (el) el.style.display = t === tabName ? 'block' : 'none';
+      });
+      document.querySelectorAll('.w-tab').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+    }
+
+    async function fetchLiveStandings() {
+      try {
+        const res = await fetch('/api/standings');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && Array.isArray(data.standings) && data.standings.length >= 15) {
+          OFFICIAL_STANDINGS = data.standings;
+          renderStandingsTable();
+        }
+        if (data && Array.isArray(data.fixtures) && data.fixtures.length >= 5) {
+          OFFICIAL_FIXTURES = data.fixtures.map(f => ({
+            ...f,
+            isDerby: f.home.includes('GALATASARAY') && f.away.includes('FENERBAHÇE')
+          }));
+          renderFixturesList();
+        }
+        if (data && data.updatedAt) {
+          document.getElementById('tffLiveBadge').textContent = `● TFF CANLI (${data.updatedAt})`;
+        }
+      } catch (e) {}
+    }
+
     function detectCategory(title, summary) {
       const text = (title + ' ' + summary).toLowerCase();
-      if (text.includes('galatasaray') || text.includes('okan buruk') || text.includes('icardi') || text.includes('osimhen') || text.includes('cimbom')) return 'GALATASARAY';
-      if (text.includes('fenerbahçe') || text.includes('mourinho') || text.includes('fener') || text.includes('ederson') || text.includes('nesyri')) return 'FENERBAHÇE';
-      if (text.includes('beşiktaş') || text.includes('sergen') || text.includes('siyah-beyaz') || text.includes('immobile') || text.includes('miretti')) return 'BEŞİKTAŞ';
-      if (text.includes('trabzonspor') || text.includes('şenol güneş') || text.includes('bordo-mavi')) return 'TRABZONSPOR';
-      if (text.includes('transfer') || text.includes('kanca') || text.includes('imza') || text.includes('teklif') || text.includes('bonservis')) return 'TRANSFER';
-      if (text.includes('ronaldo') || text.includes('real madrid') || text.includes('barcelona') || text.includes('münih') || text.includes('lille') || text.includes('avrupa') || text.includes('şampiyonlar ligi')) return 'AVRUPA';
+      if (text.includes('galatasaray') || text.includes('okan buruk') || text.includes('g.saray') || text.includes('osimhen') || text.includes('cimbom')) return 'GALATASARAY';
+      if (text.includes('fenerbahçe') || text.includes('f.bahçe') || text.includes('ismail kartal') || text.includes('fener') || text.includes('muriqi')) return 'FENERBAHÇE';
+      if (text.includes('beşiktaş') || text.includes('italiano') || text.includes('siyah-beyaz') || text.includes('miretti') || text.includes('vlahovic')) return 'BEŞİKTAŞ';
+      if (text.includes('trabzonspor') || text.includes('thomas reis') || text.includes('bordo-mavi') || text.includes('salah')) return 'TRABZONSPOR';
+      if (text.includes('münih') || text.includes('kompany') || text.includes('juventus') || text.includes('psg') || text.includes('real madrid') || text.includes('barcelona') || text.includes('lille') || text.includes('avrupa') || text.includes('şampiyonlar ligi')) return 'AVRUPA';
       return 'SÜPER LİG';
     }
 
@@ -1204,7 +1619,7 @@
     function renderGrid() {
       const gridEl = document.getElementById('newsGrid');
       const list = filteredArticles.slice(0, 24);
-      const fallbackImg = 'https://cdn.ajansspor.com/ajansspor/photo/2026/10/52d8ad8c-9c22-4e4d-84cc-5a00462e66f6.jpg';
+      const fallbackImg = 'https://im.haberturk.com/l/2026/10/23/ver1792757508/3922039/jpg/1920x1080';
       gridEl.innerHTML = list.map((item, idx) => `
         <article class="news-card" onclick="openModalByIndex(${idx})">
           <div class="card-img-wrap">
@@ -1307,7 +1722,7 @@
           allArticles = data.map((art, i) => ({
             ...art,
             category: art.category || detectCategory(art.title || '', art.summary || ''),
-            timeAgo: art.timeAgo || (i === 0 ? 'Az Önce' : `${i * 4 + 2} dk önce`)
+            timeAgo: art.timeAgo || (i === 0 ? 'Az Önce' : `${i * 3 + 2} dk önce`)
           }));
           applyFilter();
           renderTickerAndTrending();
@@ -1316,22 +1731,23 @@
             `Son Güncelleme: ${now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
         }
       } catch (e) {
-        console.error('Haber akışı hatası:', e);
+        // Dosya olarak doğrudan açıldığında da güncel kalması için varsayılan saat göstergesi
+        const now = new Date();
+        document.getElementById('lastUpdateText').textContent =
+          `Güncel Akış (${now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })})`;
       }
     }
 
-    if (window.__PRELOADED_NEWS && window.__PRELOADED_NEWS.length) {
-      allArticles = window.__PRELOADED_NEWS.map((art, i) => ({
-        ...art,
-        category: art.category || detectCategory(art.title || '', art.summary || ''),
-        timeAgo: art.timeAgo || (i === 0 ? 'Az Önce' : `${i * 4 + 2} dk önce`)
-      }));
-    }
+    renderStandingsTable();
+    renderFixturesList();
+    renderScorersTable();
     applyFilter();
     renderTickerAndTrending();
     fetchLiveNews();
+    fetchLiveStandings();
     heroInterval = setInterval(() => renderHero(currentHeroIndex + 1), 6000);
     setInterval(fetchLiveNews, 60000);
+    setInterval(fetchLiveStandings, 120000);
   </script>
 </body>
 </html>
