@@ -125,6 +125,55 @@ def get_portal_news_feed():
         PORTAL_NEWS_CACHE["items"] = items
     return PORTAL_NEWS_CACHE["items"]
 
+PORTAL_STANDINGS_CACHE = {"ts": 0, "data": None}
+
+def get_live_tff_standings():
+    now = time.time()
+    if PORTAL_STANDINGS_CACHE["data"] and (now - PORTAL_STANDINGS_CACHE["ts"] < 120):
+        return PORTAL_STANDINGS_CACHE["data"]
+    try:
+        r = requests.get("https://www.tff.org/default.aspx?pageID=198", headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
+        raw = r.content.decode("latin1", errors="ignore")
+        replacements = {
+            "&#252;": "ü", "&#220;": "Ü", "&#246;": "ö", "&#214;": "Ö",
+            "&#231;": "ç", "&#199;": "Ç", "&nbsp;": " ",
+            "Ý": "İ", "Þ": "Ş", "Ð": "Ğ", "ý": "ı", "þ": "ş", "ð": "ğ"
+        }
+        for k, v in replacements.items():
+            raw = raw.replace(k, v)
+        text = re.sub(r"<script[\s\S]*?</script>", " ", raw, flags=re.I)
+        text = re.sub(r"<style[\s\S]*?</style>", " ", text, flags=re.I)
+        text = re.sub(r"<[^>]+>", " ", text)
+        text = re.sub(r"\s+", " ", text)
+
+        standings = []
+        m_block = re.search(r"O\s+G\s+B\s+M\s+A\s+Y\s+AV\s+P\s+(.*?)Not:\s+Futbol", text)
+        if m_block:
+            for m in re.finditer(r"(\d+)\.([A-ZÇĞİÖŞÜ.\s-]+?)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(-?\d+)\s+(\d+)", m_block.group(1)):
+                tname = re.sub(r"\s*A\.Ş\.|\s*FUTBOL KULÜBÜ", "", m.group(2)).strip()
+                standings.append({
+                    "rank": int(m.group(1)),
+                    "team": tname.title() if len(tname) > 4 else tname,
+                    "played": int(m.group(3)),
+                    "won": int(m.group(4)),
+                    "drawn": int(m.group(5)),
+                    "lost": int(m.group(6)),
+                    "gf": int(m.group(7)),
+                    "ga": int(m.group(8)),
+                    "gd": int(m.group(9)),
+                    "points": int(m.group(10))
+                })
+        if len(standings) >= 15:
+            PORTAL_STANDINGS_CACHE["ts"] = now
+            PORTAL_STANDINGS_CACHE["data"] = {
+                "season": "Trendyol Süper Lig 2026-2027",
+                "updatedAt": time.strftime("%H:%M"),
+                "standings": standings
+            }
+    except Exception as e:
+        log(f"TFF canlı veri uyarısı: {e}")
+    return PORTAL_STANDINGS_CACHE["data"] or {}
+
 class HealthHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -138,6 +187,24 @@ class HealthHandler(http.server.SimpleHTTPRequestHandler):
             news = get_portal_news_feed()
             self.wfile.write(json.dumps(news, ensure_ascii=False).encode("utf-8"))
             return
+
+        if parsed.path == '/api/standings':
+            self.send_response(200)
+            self.send_header("Content-type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            st = get_live_tff_standings()
+            self.wfile.write(json.dumps(st, ensure_ascii=False).encode("utf-8"))
+            return
+
+        if parsed.path in ['/manifest.json', 'manifest.json']:
+            m_file = Path(__file__).parent / "manifest.json"
+            if m_file.exists():
+                self.send_response(200)
+                self.send_header("Content-type", "application/manifest+json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(m_file.read_bytes())
+                return
 
         if parsed.path in ['/templates/tam90_profile.png', '/templates/tam90_logo.png', '/templates/sponsors_footer.png']:
             asset_file = Path(__file__).parent / parsed.path.lstrip('/')
