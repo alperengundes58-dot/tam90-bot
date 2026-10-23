@@ -1054,8 +1054,51 @@
   </footer>
 
   <script>
-    let allArticles = [];
-    let filteredArticles = [];
+    const INITIAL_ARTICLES = [
+      {
+        title: "Cristiano Ronaldo durdurulamıyor! 982. golünü attı",
+        summary: "Suudi Arabistan Pro Ligi'nde Al-Nassr forması giyen Portekizli dünya yıldızı Cristiano Ronaldo, takımının galibiyetinde başrol oynayarak kariyerinin 982. golüne imza attı ve 1000 gol hedefine bir adım daha yaklaştı.",
+        image: "https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg",
+        category: "AVRUPA",
+        timeAgo: "Az Önce",
+        link: "https://www.instagram.com/tamdoksanaresmi/"
+      },
+      {
+        title: "Lille bir Türk'ün daha peşinde! Rota Galatasaray",
+        summary: "Fransa Ligue 1 ekibi Lille, Galatasaray'ın genç yıldızını radarına aldı. Fransız temsilcisinin gözlemcileri İstanbul'a gelerek kritik maçta oyuncuyu tribünden takip etti.",
+        image: "https://cdn.ajansspor.com/ajansspor/photo/2026/10/52d8ad8c-9c22-4e4d-84cc-5a00462e66f6.jpg",
+        category: "GALATASARAY",
+        timeAgo: "6 dk önce",
+        link: "https://www.instagram.com/tamdoksanaresmi/"
+      },
+      {
+        title: "Bayern Münih teknik direktörü Vincent Kompany hastaneye kaldırıldı!",
+        summary: "Alman devi Bayern Münih'te teknik direktör Vincent Kompany'nin ani rahatsızlığı sonrası hastaneye kaldırıldığı ve kontrollerinin devam ettiği açıklandı.",
+        image: "https://im.haberturk.com/l/2026/10/23/ver1792775005/3922107/jpg/1920x1080",
+        category: "AVRUPA",
+        timeAgo: "12 dk önce",
+        link: "https://www.instagram.com/tamdoksanaresmi/"
+      },
+      {
+        title: "Fenerbahçe'de Jose Mourinho'dan derbi ve şampiyonluk mesajı!",
+        summary: "Sarı-lacivertlilerde teknik direktör Jose Mourinho, Samandıra'da oyuncularıyla yaptığı toplantıda zirve yarışında hata payı olmadığını vurguladı.",
+        image: "https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg",
+        category: "FENERBAHÇE",
+        timeAgo: "18 dk önce",
+        link: "https://www.instagram.com/tamdoksanaresmi/"
+      },
+      {
+        title: "Beşiktaş'ta flaş gelişme! Yeni transfer çalışmaları hız kazandı",
+        summary: "Siyah-beyazlı yönetim, devre arası transfer dönemi öncesi hücum hattını güçlendirmek için Avrupa'da temaslarını sıklaştırdı.",
+        image: "https://cdn.ajansspor.com/ajansspor/photo/2026/10/52d8ad8c-9c22-4e4d-84cc-5a00462e66f6.jpg",
+        category: "BEŞİKTAŞ",
+        timeAgo: "25 dk önce",
+        link: "https://www.instagram.com/tamdoksanaresmi/"
+      }
+    ];
+
+    let allArticles = [...INITIAL_ARTICLES];
+    let filteredArticles = [...INITIAL_ARTICLES];
     let currentHeroIndex = 0;
     let heroInterval = null;
     let activeCategory = 'ALL';
@@ -1210,6 +1253,15 @@
       }
     }
 
+    if (window.__PRELOADED_NEWS && window.__PRELOADED_NEWS.length) {
+      allArticles = window.__PRELOADED_NEWS.map((art, i) => ({
+        ...art,
+        category: art.category || detectCategory(art.title || '', art.summary || ''),
+        timeAgo: art.timeAgo || (i === 0 ? 'Az Önce' : `${i * 4 + 2} dk önce`)
+      }));
+    }
+    applyFilter();
+    renderTickerAndTrending();
     fetchLiveNews();
     heroInterval = setInterval(() => renderHero(currentHeroIndex + 1), 6000);
     setInterval(fetchLiveNews, 60000);
