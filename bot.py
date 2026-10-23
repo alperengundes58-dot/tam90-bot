@@ -12,7 +12,7 @@ from pathlib import Path
 
 import requests
 import feedparser
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
 from instagrapi import Client
 from instagrapi.exceptions import TwoFactorRequired, ChallengeRequired
 
@@ -82,21 +82,14 @@ class HealthHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Content-type", "application/json; charset=utf-8")
             self.end_headers()
             code = params.get('code', [None])[0]
-            self.wfile.write(json.dumps({"status": "ok", "message": "Ultra HD Viral Gönderi Tetiklendi!"}).encode("utf-8"))
+            self.wfile.write(json.dumps({"status": "ok", "message": "Ultra 4K Viral Gönderi Tetiklendi!"}).encode("utf-8"))
             threading.Thread(target=execute_post, args=(code,)).start()
             return
 
         self.send_response(200)
         self.send_header("Content-type", "text/plain; charset=utf-8")
         self.end_headers()
-        self.wfile.write("⚽️ TAM DOKSAN (@tamdoksanaresmi) 7/24 Kesintisiz Otopilot Yayında!".encode("utf-8"))
-
-def start_server():
-    with socketserver.TCPServer(("", PORT), HealthHandler) as httpd:
-        log(f"Web sunucusu {PORT} portunda dinliyor...")
-        httpd.serve_forever()
-
-threading.Thread(target=start_server, daemon=True).start()
+        self.wfile.write("⚽️ TAM DOKSAN (@tamdoksanaresmi) 7/24 Kesintisiz Ultra 4K Otopilot Yayında!".encode("utf-8"))
 
 # 4. Instagram İstemcisi
 IG_USERNAME = os.environ.get("IG_USERNAME", "tamdoksanaresmi")
@@ -121,7 +114,7 @@ def login_instagram(two_factor_code=None):
 
     try:
         if two_factor_code:
-            log(f"2FA Kodu ile giriş yapılıyor...")
+            log("2FA Kodu ile giriş yapılıyor...")
             cl.login(IG_USERNAME, IG_PASSWORD, verification_code=two_factor_code)
         else:
             cl.login(IG_USERNAME, IG_PASSWORD)
@@ -137,7 +130,7 @@ def login_instagram(two_factor_code=None):
         log(f"Giriş hatası: {type(e).__name__} - {e}")
         return False
 
-# 5. Gerçek Zamanlı ve Güncel Basın Fotoğrafı Çekici (SADECE BUGÜNÜN SON DAKİKA HABERLERİ)
+# 5. Gerçek Zamanlı ve Güncel Basın Fotoğrafı + Haber Özeti Çekici
 ALREADY_POSTED_FILE = Path(__file__).parent / "posted_articles.json"
 
 def get_posted_titles():
@@ -156,38 +149,52 @@ def save_posted_title(title):
     except:
         pass
 
+def clean_html(raw_html):
+    if not raw_html:
+        return ""
+    text = re.sub(r'<!\[CDATA\[|\]\]>', '', raw_html)
+    text = re.sub(r'<[^>]+>', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
 def get_live_headline_and_photo():
     posted_titles = get_posted_titles()
-    
-    # 100% Gerçek zamanlı, dakikası dakikasına güncellenen Türk spor kaynakları
+
+    # Sadece anlık güncellenen Full HD Türk spor kaynakları
     sources = [
-        "https://ajansspor.com/rss",
         "https://www.haberturk.com/rss/spor.xml",
+        "https://ajansspor.com/rss",
         "https://www.sabah.com.tr/rss/spor.xml"
     ]
+
+    # Düşük etkileşimli/amatör/tesis haberlerini filtrele
+    skip_keywords = ["inşaat", "stadyumu", "voleybol", "hentbol", "güreş", "atletizm", "boks", "tenis"]
 
     for url in sources:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:15]:
-                title = entry.title.strip()
-                title = re.sub(r'<!\[CDATA\[|\]\]>', '', title).strip()
-                link = entry.link
+            for entry in feed.entries[:18]:
+                title = clean_html(entry.get("title", ""))
+                summary = clean_html(entry.get("summary", "") or entry.get("description", ""))
+                link = entry.get("link", "")
                 img_url = None
 
-                # Zaten paylaşıldıysa atla
-                if title in posted_titles:
+                if not title or title in posted_titles:
                     continue
 
-                # 1. Enclosure görseli kontrol et
+                lower_t = title.lower()
+                if any(sk in lower_t for sk in skip_keywords):
+                    continue
+
+                # 1. Enclosure görseli
                 if 'enclosures' in entry and len(entry.enclosures) > 0:
                     img_url = entry.enclosures[0].get('href')
 
-                # 2. Media content kontrol et
+                # 2. Media content görseli
                 if not img_url and 'media_content' in entry and len(entry.media_content) > 0:
                     img_url = entry.media_content[0].get('url')
 
-                # 3. Sayfa içi og:image kontrol et
+                # 3. Sayfa içi og:image
                 if not img_url and link:
                     try:
                         r = requests.get(link, headers={"User-Agent": "Mozilla/5.0"}, timeout=6)
@@ -198,45 +205,90 @@ def get_live_headline_and_photo():
                         pass
 
                 if img_url and ("http" in img_url):
-                    # TM Grup orijinal basın fotoğrafını u= parametresinden çıkar
                     if "u=http" in img_url:
                         try:
                             img_url = urllib.parse.unquote(img_url.split("u=")[1])
                         except:
                             pass
-                    
+
                     log(f"🔥 BUGÜNÜN SICAK HABERİ SEÇİLDİ: {title}")
-                    log(f"📸 Orijinal Fotoğraf URL: {img_url}")
+                    log(f"📸 Orijinal HD Fotoğraf URL: {img_url}")
                     save_posted_title(title)
-                    return title, img_url
+                    return title, summary, img_url
         except Exception as e:
             log(f"Haber çekme uyarısı ({url}): {e}")
 
-    # Fallback
-    return "Lille bir Türk'ün daha peşinde! Rota Galatasaray", "https://cdn.ajansspor.com/ajansspor/photo/2026/10/52d8ad8c-9c22-4e4d-84cc-5a00462e66f6.jpg"
+    return (
+        "Cristiano Ronaldo durdurulamıyor! 982. golünü attı",
+        "Suudi Arabistan Pro Ligi'nde Al-Nassr forması giyen Portekizli dünya yıldızı Cristiano Ronaldo, takımının galibiyetinde başrol oynayarak kariyerinin 982. golüne imza attı ve 1000 gol hedefine bir adım daha yaklaştı.",
+        "https://cdn.ajansspor.com/ajansspor/photo/2026/10/aaac7ade-104b-485b-a4b7-c44b8a2aa1e8.jpg"
+    )
 
-# 6. Kısa, Net ve Vurucu Manşet Motoru (YeniAçık Tarzı - 2-4 Kelime, Devasa Boyut)
+# 6. Haberin Konusuna Göre Akıllı ve Mantıklı Açıklama (Caption) Üretici
+def generate_smart_caption(title, summary):
+    lower = f"{title} {summary}".lower()
+
+    # Özeti temizle ve başlıkla birebir aynıysa tekrarı önle
+    body_text = summary.strip() if summary and len(summary.strip()) > 25 else ""
+    if body_text.lower() == title.lower():
+        body_text = ""
+
+    # Konuya özel soru ve emoji seçimi (ASLA alakasız "Sizce bu karar doğru mu?" yazmaz!)
+    if any(k in lower for k in ["hastane", "sakat", "ameliyat", "tedavi", "kırık", "şok", "sağlık", "geçmiş olsun"]):
+        question = "🙏 Geçmiş olsun dileklerimizi iletiyoruz. Sizce yokluğu takımı nasıl etkiler? Yorumlarda buluşalım 👇"
+    elif any(k in lower for k in ["gol", "kazandı", "mağlup", "berabere", "galip", "zafer", "puan", "derbi", "skor", "982"]):
+        question = "🔥 Bu performansı ve maçın sonucunu nasıl değerlendiriyorsunuz? Yorumlarınızı bekliyoruz! 👇⚽️"
+    elif any(k in lower for k in ["transfer", "imza", "teklif", "kanca", "devrede", "ayrılık", "bonservis", "sözleşme"]):
+        question = "👀 Sizce bu transfer gerçekleşirse takıma doğrudan katkı sağlar mı? Fikirlerinizi yorumlara yazın! 👇⚽️"
+    elif any(k in lower for k in ["hakem", "ceza", "pfdk", "tff", "kırmızı kart", "penaltı", "var ", "iptal"]):
+        question = "⚖️ Verilen bu karar hakkında siz ne düşünüyorsunuz? Yorumlarda tartışalım! 👇⚽️"
+    else:
+        question = "💬 Bu sıcak gelişme hakkında sizin düşünceleriniz neler? Yorumlarda buluşalım! 👇⚽️"
+
+    if body_text:
+        caption = (
+            f"🚨 {title}\n\n"
+            f"📰 {body_text}\n\n"
+            f"{question}\n.\n.\n"
+            f"#tamdoksan #futbol #süperlig #fenerbahçe #galatasaray #beşiktaş #trabzonspor #sondakika #spor #keşfet"
+        )
+    else:
+        caption = (
+            f"🚨 {title}\n\n"
+            f"{question}\n.\n.\n"
+            f"#tamdoksan #futbol #süperlig #fenerbahçe #galatasaray #beşiktaş #trabzonspor #sondakika #spor #keşfet"
+        )
+    return caption
+
+# 7. Kısa, Net ve Vurucu 2 Satırlık Manşet Motoru (YeniAçık & Tam90 Tarzı)
+def tr_upper(text):
+    return text.replace("i", "İ").replace("ı", "I").replace("ğ", "Ğ").replace("ü", "Ü").replace("ş", "Ş").replace("ö", "Ö").replace("ç", "Ç").upper()
+
 def format_football_headline(title):
     clean = re.sub(r'^(FLAŞ|SON DAKİKA|ÖZEL HABER|ÖZEL|HABER|TRANSFER|RESMİ AÇIKLAMA|RESMİ|VİDEO)\s*[:|-]\s*', '', title, flags=re.I).strip()
     clean = clean.replace('"', '').replace("'", "").replace("’", "").replace("“", "").replace("”", "").strip()
     clean = clean.rstrip('.!')
     lower = clean.lower()
 
-    # 1. Transfer ve Kanca Haberleri
+    if "ronaldo" in lower and "982" in lower:
+        return "CRISTIANO RONALDO", "982. GOLÜNÜ ATTI !"
+    if "ronaldo" in lower:
+        return "CRISTIANO RONALDO", "DURDURULAMIYOR !"
     if "lille" in lower and "galatasaray" in lower:
         return "LILLE'DEN", "CİMBOM'A KANCA !"
     if "sergen" in lower:
-        return "SERGEN YALÇIN", "YOLA KOYULDU !"
-    if "ronaldo" in lower:
-        return "CRISTIANO RONALDO", "DURDURULAMIYOR !"
+        return "SERGEN YALÇIN", "HAREKETE GEÇTİ !"
     if "miretti" in lower or ("beşiktaş" in lower and "sakat" in lower):
-        return "BEŞİKTAŞ'TA", "MİRETTİ ŞOKU !"
-    if "zeki çelik" in lower or "sakatlandı" in lower:
-        return "MİLLİ YILDIZDAN", "KÖTÜ HABER !"
+        return "BEŞİKTAŞ'TA", "SAKATlık ŞOKU !"
     if "kompany" in lower or "hastane" in lower:
-        return "BAYERN MÜNİH'TE", "BÜYÜK ŞOK !"
+        return "VINCENT KOMPANY", "HASTANEYE KALDIRILDI !"
+    if "mourinho" in lower:
+        return "JOSE MOURINHO", "GÜNDEMİ SARSTI !"
+    if "osimhen" in lower:
+        return "VICTOR OSIMHEN", "KARARINI VERDİ !"
+    if "icardi" in lower:
+        return "MAURO ICARDI", "GERİ DÖNÜYOR !"
 
-    # 2. Maç & Beraberlik & Düello
     if any(k in lower for k in ["berabere", "düello", "yenişemedi"]):
         if "beşiktaş" in lower:
             return "BEŞİKTAŞ'TAN", "MÜTHİŞ DÜELLO !"
@@ -246,175 +298,183 @@ def format_football_headline(title):
             return "GALATASARAY'DAN", "MÜTHİŞ DÜELLO !"
         return "GOL DÜELLOSU", "KAZANAN ÇIKMADI !"
 
-    # 3. Galibiyet & Zafer
     if any(k in lower for k in ["galip", "kazandı", "yendi", "mağlup etti", "zafer"]):
         if "beşiktaş" in lower:
-            return "BEŞİKTAŞ", "FARKLI KAZANDI !"
+            return "BEŞİKTAŞ", "ZAFERE ULAŞTI !"
         elif "fenerbahçe" in lower:
-            return "FENERBAHÇE", "FARKLI KAZANDI !"
+            return "FENERBAHÇE", "ZAFERE ULAŞTI !"
         elif "galatasaray" in lower:
-            return "GALATASARAY", "FARKLI KAZANDI !"
-        return "MÜTHİŞ ZAFER", "KAZANMAYI BİLDİ !"
+            return "GALATASARAY", "ZAFERE ULAŞTI !"
+        return "KRİTİK MAÇTA", "DEV ZAFER !"
 
-    # 4. Genel Transfer
-    if any(k in lower for k in ["transfer", "devrede", "anlaştı", "imza"]):
-        words = clean.split()
-        if len(words) >= 2:
-            return f"{words[0]} {words[1]}".upper(), "AVRUPA DEVİ DEVREDE !"
-        return "FLAŞ TRANSFER", "ANLAŞMA SAĞLANDI !"
-
-    # 5. Genel Durum (2-4 Kelime)
-    words = clean.split()
+    words = [tr_upper(w) for w in clean.split() if w]
     if len(words) <= 2:
-        return words[0].upper(), (words[1] + " !").upper() if len(words) > 1 else "FLAŞ GELİŞME !"
-    elif len(words) <= 4:
-        return f"{words[0]} {words[1]}".upper(), f"{' '.join(words[2:])} !".upper()
+        return words[0], (words[1] + " !") if len(words) > 1 else "FLAŞ GELİŞME !"
+    elif len(words) == 3:
+        return f"{words[0]} {words[1]}", f"{words[2]} !"
     else:
-        return f"{words[0]} {words[1]}".upper(), f"{words[2]} {words[3]} !".upper()
+        return f"{words[0]} {words[1]}", f"{words[2]} {words[3]} !"
 
-# 7. 1080x1350 Tam Doksan Orijinal Tasarım Motoru (BÜYÜK YAZI, SIFIR BOŞLUK)
+# 8. Ultra 4K (2160x2700 Supersampled) Tam Doksan Tasarım Motoru
+def render_tall_grunge_line(text, target_w, color_top, color_bot, font_path, seed):
+    # Yüksek çözünürlüklü geçici katmanda çizip dikey 1.28x uzatarak (İsmail Yüksek / YeniAçık stili) oluşturur
+    base_size = 240
+    font = ImageFont.truetype(font_path, base_size)
+    dummy = Image.new("RGBA", (10, 10))
+    d_draw = ImageDraw.Draw(dummy)
+
+    while base_size > 90:
+        font = ImageFont.truetype(font_path, base_size)
+        bbox = d_draw.textbbox((0, 0), text, font=font)
+        if (bbox[2] - bbox[0]) <= target_w:
+            break
+        base_size -= 3
+
+    bbox = d_draw.textbbox((0, 0), text, font=font)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+    pad = 40
+
+    layer_w = tw + pad * 2
+    layer_h = th + pad * 2
+
+    # 1. İnce keskin siyah dış kontur katmanı (3px)
+    stroke_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
+    s_draw = ImageDraw.Draw(stroke_layer)
+    ox = pad - bbox[0]
+    oy = pad - bbox[1]
+    for dx in range(-4, 5):
+        for dy in range(-4, 5):
+            if dx * dx + dy * dy <= 16:
+                s_draw.text((ox + dx, oy + dy), text, font=font, fill=(0, 0, 0, 255))
+
+    # 2. Harf maskesi ve iç dolgu
+    mask = Image.new("L", (layer_w, layer_h), 0)
+    m_draw = ImageDraw.Draw(mask)
+    m_draw.text((ox, oy), text, font=font, fill=255)
+
+    fill_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
+    f_draw = ImageDraw.Draw(fill_layer)
+    for y in range(layer_h):
+        t = max(0.0, min(1.0, (y - pad) / max(1, th)))
+        r = int(color_top[0] * (1 - t) + color_bot[0] * t)
+        g = int(color_top[1] * (1 - t) + color_bot[1] * t)
+        b = int(color_top[2] * (1 - t) + color_bot[2] * t)
+        f_draw.line([(0, y), (layer_w, y)], fill=(r, g, b, 255))
+
+    # 3. Harflerin içine hafif grunge / eskitme dokusu (İsmail Yüksek görselindeki gibi)
+    rng = random.Random(seed)
+    for _ in range(420):
+        gx = rng.randint(pad, layer_w - pad)
+        gy = rng.randint(pad + int(th * 0.25), pad + th)
+        gw = rng.randint(2, 7)
+        gh = rng.randint(2, 8)
+        f_draw.rectangle([gx, gy, gx + gw, gy + gh], fill=(14, 14, 14, 215))
+
+    textured_text = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
+    textured_text.paste(fill_layer, (0, 0), mask)
+
+    combined = Image.alpha_composite(stroke_layer, textured_text)
+
+    # 4. Dikey 1.28x esnetme (Tam spor manşeti proporsiyonu)
+    stretched_h = int(layer_h * 1.28)
+    stretched = combined.resize((layer_w, stretched_h), Image.Resampling.LANCZOS)
+
+    # 5. Yumuşak ve derin stadyum gölgesi (Gaussian Blur)
+    shadow_alpha = stretched.split()[3]
+    shadow_blur = shadow_alpha.filter(ImageFilter.GaussianBlur(radius=14))
+    shadow_img = Image.new("RGBA", stretched.size, (0, 0, 0, 0))
+    black_solid = Image.new("RGBA", stretched.size, (0, 0, 0, 235))
+    shadow_img.paste(black_solid, (0, 0), shadow_blur)
+
+    final_line = Image.new("RGBA", (stretched.width + 24, stretched.height + 24), (0, 0, 0, 0))
+    final_line.paste(shadow_img, (12, 18), shadow_img)
+    final_line.paste(stretched, (12, 6), stretched)
+    return final_line
+
 def generate_tam90_post(raw_image_path, title, output_path):
-    canvas_w, canvas_h = 1080, 1350
-    footer_h = 196
-    target_photo_h = canvas_h - footer_h  # 1154px (Sıfır siyah boşluk, tam doluluk!)
+    # 2160 x 2700 GERÇEK 4K SUPERSAMPLED TUVAL
+    W, H = 2160, 2700
+    footer_h = 448  # 224px * 2 (Birebir kilitli alt şablon yüksekliği)
+    photo_h = H - footer_h + 40  # Kesintisiz geçiş
 
-    canvas = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 255))
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 255))
 
-    # 1. Gerçek Basın Fotoğrafı (Tam doluluk ile)
+    # 1. Basın Fotoğrafını 4K Netleştir ve Yerleştir
     raw_img = Image.open(raw_image_path).convert("RGBA")
-    
-    enhancer = ImageEnhance.Sharpness(raw_img)
-    raw_img = enhancer.enhance(1.25)
-    color_enhancer = ImageEnhance.Color(raw_img)
-    raw_img = color_enhancer.enhance(1.08)
-
     img_ratio = raw_img.width / raw_img.height
-    target_ratio = canvas_w / target_photo_h
+    target_ratio = W / photo_h
 
     if img_ratio > target_ratio:
-        scale_h = target_photo_h
-        scale_w = int(target_photo_h * img_ratio)
+        scale_h = photo_h
+        scale_w = int(photo_h * img_ratio)
     else:
-        scale_w = canvas_w
-        scale_h = int(canvas_w / img_ratio)
+        scale_w = W
+        scale_h = int(W / img_ratio)
 
     resized_photo = raw_img.resize((scale_w, scale_h), Image.Resampling.LANCZOS)
-    left = (scale_w - canvas_w) // 2
-    top = (scale_h - target_photo_h) // 2
-    cropped_photo = resized_photo.crop((left, top, left + canvas_w, top + target_photo_h))
-    canvas.paste(cropped_photo, (0, 0))
+    left = (scale_w - W) // 2
+    top = int((scale_h - photo_h) * 0.15)  # Yüz/kafa kesilmemesi için üst ağırlıklı kadraj
+    cropped_photo = resized_photo.crop((left, top, left + W, top + photo_h))
 
-    # Alt Kısma Yumuşak Karartma Degradesi (Yazının net okunması için)
-    gradient_h = 550
-    gradient_y = target_photo_h - gradient_h
-    gradient = Image.new('L', (canvas_w, gradient_h))
-    for y in range(gradient_h):
-        alpha = int(255 * (y / gradient_h) ** 1.5)
-        for x in range(canvas_w):
-            gradient.putpixel((x, y), alpha)
-    black_layer = Image.new('RGBA', (canvas_w, gradient_h), (0, 0, 0, 255))
-    canvas.paste(black_layer, (0, gradient_y), gradient)
+    # Ultra 4K Keskinlik ve Canlılık
+    rgb_photo = cropped_photo.convert("RGB")
+    rgb_photo = rgb_photo.filter(ImageFilter.UnsharpMask(radius=1.8, percent=135, threshold=3))
+    rgb_photo = ImageEnhance.Contrast(rgb_photo).enhance(1.08)
+    rgb_photo = ImageEnhance.Color(rgb_photo).enhance(1.12)
+    canvas.paste(rgb_photo.convert("RGBA"), (0, 0))
 
-    draw = ImageDraw.Draw(canvas)
+    # 2. Alt Kısma Sinematik Yumuşak Karartma Degradesi
+    grad_h = 1150
+    grad_y = (H - footer_h) - grad_h
+    grad_col = Image.new("L", (1, grad_h))
+    for y in range(grad_h):
+        t = y / grad_h
+        alpha = int(255 * (t ** 1.65))
+        grad_col.putpixel((0, y), alpha)
+    grad_mask = grad_col.resize((W, grad_h), Image.Resampling.BILINEAR)
+    black_overlay = Image.new("RGBA", (W, grad_h), (0, 0, 0, 255))
+    canvas.paste(black_overlay, (0, grad_y), grad_mask)
 
-    # 2. Sol Üst TAM90 Logosu
+    # 3. Sol Üst TAM90 Logosu (Pürüzsüz, lekesiz)
     logo_path = Path(__file__).parent / "templates" / "tam90_logo.png"
     if logo_path.exists():
         logo_img = Image.open(logo_path).convert("RGBA")
-        logo_w = 280
+        logo_w = 490
         logo_h = int(logo_img.height * (logo_w / logo_img.width))
         logo_resized = logo_img.resize((logo_w, logo_h), Image.Resampling.LANCZOS)
-        canvas.paste(logo_resized, (30, 30), logo_resized)
+        canvas.paste(logo_resized, (52, 52), logo_resized)
 
-    # 3. Alt Sponsorlar Barı (AYDESSA + SOSYAL MEDYA + LUSTER CAR - SES BUTONSUZ)
+    # 4. Birebir Alt Sponsor Şablonu (AYDESSA + SOSYAL MEDYA + LUSTER CAR - SES BUTONSUZ)
     footer_path = Path(__file__).parent / "templates" / "sponsors_footer.png"
     if footer_path.exists():
         footer_img = Image.open(footer_path).convert("RGBA")
-        footer_resized = footer_img.resize((canvas_w, footer_h), Image.Resampling.LANCZOS)
-        canvas.paste(footer_resized, (0, canvas_h - footer_h), footer_resized)
+        footer_resized = footer_img.resize((W, footer_h), Image.Resampling.LANCZOS)
+        canvas.paste(footer_resized, (0, H - footer_h), footer_resized)
 
-    # 4. DEVASA, KALIN SPOR MANŞETİ (Impact / Arial Bold - 100px - 120px Arası!)
+    # 5. Uzun, Tok, Grunge Spor Manşeti (Anton-Regular + 1.28x Dikey Stretch)
     line1, line2 = format_football_headline(title)
+    font_path = str(Path(__file__).parent / "templates" / "Anton-Regular.ttf")
 
-    font_candidates = [
-        Path(__file__).parent / "templates" / "Anton-Regular.ttf",
-        Path(__file__).parent / "templates" / "BebasNeue-Bold.ttf",
-        Path(__file__).parent / "templates" / "arialbd.ttf",
-        Path(__file__).parent / "templates" / "headline.ttf"
-    ]
-    
-    font_file = None
-    for cand in font_candidates:
-        if isinstance(cand, Path) and cand.exists() and cand.stat().st_size > 1000:
-            font_file = str(cand)
-            break
-        elif isinstance(cand, str) and os.path.exists(cand):
-            font_file = cand
-            break
+    line1_img = render_tall_grunge_line(line1, 1940, (255, 255, 255), (235, 235, 235), font_path, 101)
+    line2_img = render_tall_grunge_line(line2, 1940, (255, 212, 0), (255, 180, 0), font_path, 202)
 
-    # 135px'den başlat (YeniAçık gibi devasa, net, vurucu!), genişliğe tam sığana kadar küçült
-    font_size = 135
-    font = None
+    # Alt şablonun hemen üstüne sıkıca istifle
+    overlap_gap = -38
+    total_h = line1_img.height + line2_img.height + overlap_gap
+    y_start = (H - footer_h - 10) - total_h
 
-    while font_size >= 60:
-        try:
-            if font_file:
-                font = ImageFont.truetype(font_file, font_size)
-            else:
-                font = ImageFont.load_default()
-                break
-        except Exception as fe:
-            log(f"Font yükleme uyarısı: {fe}")
-            break
+    x1 = (W - line1_img.width) // 2
+    x2 = (W - line2_img.width) // 2
 
-        b1 = draw.textbbox((0, 0), line1, font=font)
-        b2 = draw.textbbox((0, 0), line2, font=font)
-        w1 = b1[2] - b1[0]
-        w2 = b2[2] - b2[0]
-
-        if max(w1, w2) <= 980:
-            break
-        font_size -= 2
-
-    log(f"Kullanılan Manşet Font Boyutu: {font_size}px (Vurucu & Devasa)")
-
-    # İki satırı alt sponsor barının hemen üstüne yerleştir (sıkı, tok manşet)
-    bbox1 = draw.textbbox((0, 0), line1, font=font)
-    bbox2 = draw.textbbox((0, 0), line2, font=font)
-    h1 = bbox1[3] - bbox1[1]
-    h2 = bbox2[3] - bbox2[1]
-    line_gap = 10
-    total_text_h = h1 + h2 + line_gap
-
-    # Footer'ın 25px üstünde bitsin
-    y_start = (canvas_h - footer_h - 25) - total_text_h
-    curr_y = y_start
-
-    for line, color in [(line1, (255, 255, 255)), (line2, (255, 210, 0))]:
-        bbox = draw.textbbox((0, 0), line, font=font)
-        text_w = bbox[2] - bbox[0]
-        text_h = bbox[3] - bbox[1]
-        x_pos = (canvas_w - text_w) // 2
-
-        # 1. Derin Siyah Düşen Gölge (+6, +8)
-        for sox, soy in [(6, 8), (5, 7), (4, 6)]:
-            draw.text((x_pos + sox, curr_y + soy), line, font=font, fill=(0, 0, 0, 220))
-
-        # 2. 6px Kalın Keskin Siyah Kontur
-        for ox in range(-6, 7):
-            for oy in range(-6, 7):
-                if ox*ox + oy*oy <= 36:
-                    draw.text((x_pos + ox, curr_y + oy), line, font=font, fill=(0, 0, 0, 255))
-
-        # 3. Ana Metin
-        draw.text((x_pos, curr_y), line, font=font, fill=color)
-        curr_y += text_h + line_gap
+    canvas.paste(line1_img, (x1, y_start), line1_img)
+    canvas.paste(line2_img, (x2, y_start + line1_img.height + overlap_gap), line2_img)
 
     final_rgb = canvas.convert("RGB")
-    final_rgb.save(output_path, "JPEG", quality=98)
-    log(f"1080x1350 Ultra HD Tam Doksan görseli hazırlandı: {output_path}")
+    final_rgb.save(output_path, "JPEG", quality=98, subsampling=0)
+    log(f"✨ 2160x2700 Ultra 4K Tam Doksan görseli hazırlandı: {output_path}")
 
-# 8. Futbol Sayfasına Özel Viral Müzik
+# 9. Futbol Sayfasına Özel Viral Müzik
 def get_viral_football_track():
     queries = ["drill beat", "turkce drill", "football phonk", "stadium anthem", "hype drill"]
     query = random.choice(queries)
@@ -429,17 +489,17 @@ def get_viral_football_track():
         log(f"Müzik arama uyarısı: {e}")
     return None
 
-# 9. Gönderi Paylaşım Fonksiyonu
+# 10. Gönderi Paylaşım Fonksiyonu
 def execute_post(two_factor_code=None):
     log("Viral gönderi süreci başladı...")
-    title, img_url = get_live_headline_and_photo()
+    title, summary, img_url = get_live_headline_and_photo()
     log(f"Seçilen haber: {title}")
 
     raw_path = Path(__file__).parent / "temp_raw.jpg"
     final_path = Path(__file__).parent / "temp_post_ready.jpg"
 
     try:
-        r = requests.get(img_url, timeout=20)
+        r = requests.get(img_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
         with open(raw_path, "wb") as f:
             f.write(r.content)
     except Exception as e:
@@ -447,13 +507,7 @@ def execute_post(two_factor_code=None):
         return
 
     generate_tam90_post(raw_path, title, final_path)
-
-    caption = (
-        f"🚨 {title}\n\n"
-        f"Süper Lig'de ve Avrupa arenasında tansiyon hiç düşmüyor! Masadaki son detaylar ve perde arkasında konuşulanlar ortaya çıktı.\n\n"
-        f"👉 Sizce bu karar doğru mu? Fikirlerinizi yorumlarda paylaşın! 👇⚽️\n.\n.\n"
-        f"#tamdoksan #futbol #süperlig #fenerbahçe #galatasaray #beşiktaş #trabzonspor #transfer #haber #keşfet"
-    )
+    caption = generate_smart_caption(title, summary)
 
     if login_instagram(two_factor_code):
         uploaded = False
@@ -471,9 +525,9 @@ def execute_post(two_factor_code=None):
                 log(f"🎉🎉 HARİKA! Müzikli gönderi Instagram'da yayında: https://www.instagram.com/p/{media.code}/")
                 uploaded = True
         except Exception as music_err:
-            log(f"Müzikli yükleme atlandı ({music_err}), standart HD yüklemeye geçiliyor...")
+            log(f"Müzikli yükleme atlandı ({music_err}), standart 4K yüklemeye geçiliyor...")
 
-        # 2. Standart HD Yükleme
+        # 2. Standart 4K Yükleme
         if not uploaded:
             try:
                 log("Fotoğraf Instagram'a yükleniyor...")
@@ -484,24 +538,28 @@ def execute_post(two_factor_code=None):
     else:
         log("Giriş yapılamadığı için görsel yüklenemedi.")
 
-# 10. 7/24 Kesintisiz Döngü (10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00)
-TARGET_HOURS = [10, 12, 15, 17, 20, 22, 0]
-posted_today = set()
+# 11. 7/24 Kesintisiz Döngü (10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00)
+if __name__ == "__main__":
+    threading.Thread(target=lambda: socketserver.TCPServer(("", PORT), HealthHandler).serve_forever(), daemon=True).start()
+    log(f"Web sunucusu {PORT} portunda dinliyor...")
 
-while True:
-    now = time.localtime(time.time() + 3 * 3600)  # Türkiye Saati (UTC+3)
-    hour = now.tm_hour
-    minute = now.tm_min
-    slot_key = f"{now.tm_year}-{now.tm_yday}_{hour}"
+    TARGET_HOURS = [10, 12, 15, 17, 20, 22, 0]
+    posted_today = set()
 
-    if hour in TARGET_HOURS and minute == 0 and slot_key not in posted_today:
-        posted_today.add(slot_key)
-        try:
-            execute_post()
-        except Exception as e:
-            log(f"Zamanlanmış paylaşım hatası: {e}")
+    while True:
+        now = time.localtime(time.time() + 3 * 3600)  # Türkiye Saati (UTC+3)
+        hour = now.tm_hour
+        minute = now.tm_min
+        slot_key = f"{now.tm_year}-{now.tm_yday}_{hour}"
 
-    if hour == 0 and minute == 5:
-        posted_today.clear()
+        if hour in TARGET_HOURS and minute == 0 and slot_key not in posted_today:
+            posted_today.add(slot_key)
+            try:
+                execute_post()
+            except Exception as e:
+                log(f"Zamanlanmış paylaşım hatası: {e}")
 
-    time.sleep(30)
+        if hour == 0 and minute == 5:
+            posted_today.clear()
+
+        time.sleep(30)
