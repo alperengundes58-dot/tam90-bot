@@ -915,12 +915,29 @@ def execute_story():
     else:
         log("Giriş yapılamadığı için Story yüklenemedi.")
 
+class ThreadedHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
+def keep_alive_and_prewarm_daemon():
+    public_url = os.environ.get("RENDER_EXTERNAL_URL", "https://tam90-bot.onrender.com")
+    while True:
+        try:
+            get_portal_news_feed()
+            get_live_tff_standings()
+            requests.get(f"{public_url}/api/news", headers={"User-Agent": "Tam90-KeepAlive/1.0"}, timeout=10)
+            requests.get(f"{public_url}/api/standings", headers={"User-Agent": "Tam90-KeepAlive/1.0"}, timeout=10)
+        except Exception:
+            pass
+        time.sleep(180)  # Her 3 dakikada bir hem önbelleği tazele hem de Render'ı uyanık tut
+
 # 11. 7/24 Kesintisiz Döngü
 # Gönderi Saatleri: 10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00
 # Story Saatleri (Öğlen 12'den Gece 12'ye 3 Saatte Bir): 12:00, 15:00, 18:00, 21:00, 00:00
 if __name__ == "__main__":
-    threading.Thread(target=lambda: socketserver.TCPServer(("", PORT), HealthHandler).serve_forever(), daemon=True).start()
-    log(f"Web sunucusu {PORT} portunda dinliyor...")
+    threading.Thread(target=lambda: ThreadedHTTPServer(("", PORT), HealthHandler).serve_forever(), daemon=True).start()
+    threading.Thread(target=keep_alive_and_prewarm_daemon, daemon=True).start()
+    log(f"7/24 Çoklu İstek Destekli Web Sunucusu ve Anti-Sleep Motoru {PORT} portunda aktif...")
 
     TARGET_HOURS = [10, 12, 15, 17, 20, 22, 0]
     STORY_HOURS = [12, 15, 18, 21, 0]
