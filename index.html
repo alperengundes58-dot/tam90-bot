@@ -1120,6 +1120,7 @@
       font-size: 15px;
       line-height: 1.7;
       margin-bottom: 20px;
+      white-space: pre-line;
     }
 
     .modal-actions {
@@ -1397,6 +1398,7 @@
       <button class="cat-btn" data-cat="TRABZONSPOR">🌊 TRABZONSPOR</button>
       <button class="cat-btn" data-cat="SÜPER LİG">🏆 SÜPER LİG</button>
       <button class="cat-btn" data-cat="AVRUPA">🌍 AVRUPA & UCL</button>
+      <button class="cat-btn" type="button" onclick="document.getElementById('editorialColumnSection').scrollIntoView({behavior:'smooth',block:'center'})" style="color:var(--gold);">✍️ KÖŞE YAZISI (ALPEREN GÜNDEŞ)</button>
     </div>
   </nav>
 
@@ -1468,6 +1470,35 @@
           </div>
         </div>
         <div class="hero-tabs" id="heroTabs"></div>
+      </section>
+
+      <!-- GENEL YAYIN YÖNETMENİ ALPEREN GÜNDEŞ HAFTALIK KÖŞE YAZISI VİTRİNİ -->
+      <section id="editorialColumnSection" style="background:linear-gradient(135deg,#09193a 0%,#101626 60%,#0c111d 100%);border:1px solid var(--gold);border-radius:16px;padding:20px;margin-bottom:26px;box-shadow:0 12px 32px rgba(0,0,0,0.55);position:relative;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,212,0,0.2);padding-bottom:14px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <img src="templates/tam90_profile.png" alt="Alperen Gündeş" style="width:58px;height:58px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);box-shadow:0 0 16px rgba(255,212,0,0.35);flex-shrink:0;" />
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span style="background:var(--gold);color:#061539;font-family:'Chakra Petch',sans-serif;font-weight:900;font-size:11px;padding:3px 9px;border-radius:5px;letter-spacing:0.6px;">✍️ HAFTANIN KÖŞE YAZISI</span>
+                <span id="colDateBadge" style="font-size:11.5px;color:#cbd5e1;font-weight:600;">Bu Hafta</span>
+              </div>
+              <div style="font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:800;color:#fff;margin-top:3px;">
+                ALPEREN GÜNDEŞ <span style="font-size:12px;color:var(--gold);font-weight:700;">• Genel Yayın Yönetmeni</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button type="button" onclick="openColumnReader(0)" class="btn-gold" style="padding:8px 14px;font-size:12px;">📖 Yazının Tamamını Oku</button>
+            <button type="button" onclick="openColumnEditor()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,212,0,0.35);color:var(--gold);font-weight:700;font-size:11.5px;padding:8px 12px;border-radius:8px;cursor:pointer;">➕ Yeni Yazı Ekle / Yönet</button>
+          </div>
+        </div>
+
+        <div onclick="openColumnReader(0)" style="cursor:pointer;">
+          <h3 id="colHeadline" style="font-family:'Anton',Impact,sans-serif;font-size:clamp(20px,3vw,26px);color:var(--gold);letter-spacing:0.5px;line-height:1.2;margin-bottom:8px;text-transform:uppercase;"></h3>
+          <p id="colPreview" style="color:#e2e8f0;font-size:14px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;"></p>
+        </div>
+
+        <div id="colArchivePills" style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none;"></div>
       </section>
 
       <!-- SON DAKİKA HABER IZGARASI -->
@@ -1663,6 +1694,49 @@
     </div>
   </div>
 
+  <!-- GENEL YAYIN YÖNETMENİ KÖŞE YAZISI EKLEME / YÖNETİM MODALI -->
+  <div class="modal-backdrop" id="columnEditorModal">
+    <div class="modal-box" style="max-width:620px;">
+      <button class="modal-close" onclick="document.getElementById('columnEditorModal').classList.remove('open')">&times;</button>
+      <div class="modal-content">
+        <div class="hero-badges">
+          <span style="background:var(--gold);color:#061539;font-weight:900;font-size:11.5px;padding:4px 10px;border-radius:5px;">✍️ YÖNETİCİ PANELİ</span>
+          <span class="badge-cat">ALPEREN GÜNDEŞ • GENEL YAYIN YÖNETMENİ</span>
+        </div>
+        <h2 class="modal-title" style="font-size:24px;margin-bottom:12px;">HAFTALIK KÖŞE YAZISI EKLE / YÖNET</h2>
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:4px;">Yönetici Şifresi</label>
+            <input type="password" id="colPinInput" placeholder="Şifrenizi girin (Varsayılan: alperen10)" style="width:100%;background:#161a26;border:1px solid var(--border);color:#fff;padding:10px 12px;border-radius:8px;font-size:14px;outline:none;" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:4px;">Köşe Yazısı Başlığı</label>
+            <input type="text" id="colTitleInput" placeholder="Örn: Dev Derbi Öncesi Süper Lig'de Şampiyonluk Şifreleri..." style="width:100%;background:#161a26;border:1px solid var(--border);color:#fff;padding:10px 12px;border-radius:8px;font-size:14px;outline:none;" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:4px;">Hafta / Tarih Etiketi (İsteğe Bağlı)</label>
+            <input type="text" id="colDateInput" placeholder="Örn: 9. Hafta Özel • 24 Ekim 2026" style="width:100%;background:#161a26;border:1px solid var(--border);color:#fff;padding:10px 12px;border-radius:8px;font-size:14px;outline:none;" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:4px;">Köşe Yazısı Metni</label>
+            <textarea id="colContentInput" rows="6" placeholder="Haftalık değerlendirmenizi ve köşe yazınızı buraya yazın..." style="width:100%;background:#161a26;border:1px solid var(--border);color:#fff;padding:10px 12px;border-radius:8px;font-size:14px;line-height:1.5;outline:none;resize:vertical;"></textarea>
+          </div>
+          <div id="colStatusMsg" style="font-size:12.5px;font-weight:700;color:#68e325;display:none;"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" onclick="publishNewColumn()" class="btn-gold">🚀 Köşe Yazısını Yayınla</button>
+            <button type="button" onclick="document.getElementById('columnEditorModal').classList.remove('open')" class="btn-share">Kapat</button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);">
+          <div style="font-size:12px;font-weight:800;color:var(--gold);margin-bottom:8px;">📚 YAYINDAKİ KÖŞE YAZILARI ARŞİVİ</div>
+          <div id="colAdminList" style="display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MOBİL SABİT ALT NAVİGASYON BARI (NATIVE APP DENEYİMİ) -->
   <nav class="mobile-bottom-nav">
     <button class="m-nav-item active" onclick="mobileNavGo('news', this)">
@@ -1827,6 +1901,191 @@
     let heroInterval = null;
     let activeCategory = 'ALL';
     let currentModalArticle = null;
+
+    const DEFAULT_COLUMNS = [
+      {
+        id: 'col_default_1',
+        title: "Dev Derbi Öncesi Süper Lig'de Kartlar Yeniden Dağıtılıyor!",
+        date: "9. Hafta Özel • Ekim 2026",
+        author: "Alperen Gündeş",
+        role: "Genel Yayın Yönetmeni",
+        content: "Trendyol Süper Lig'de 9. haftaya girerken zirve yarışı son yılların en nefes kesici tablosuna sahne oluyor. Şampiyonlar Ligi'nde Lille deplasmanından 4-2'lik görkemli bir zaferle dönen lider Galatasaray ile ligin en golcü ve en az gol yiyen ekiplerinden Fenerbahçe arasındaki dev derbi, sadece 3 puanı değil sezonun psikolojik üstünlüğünü de belirleyecek.\n\nDiğer tarafta Amed SF, Trabzonspor, Beşiktaş ve Selçuk İnan yönetiminde çıkışa geçen Kocaelispor'un zirve takibi ligin kalitesini her hafta daha yukarı taşıyor. TAM 90 ailesi olarak her hafta en sıcak analizlerle burada olmaya devam edeceğiz."
+      }
+    ];
+
+    let editorialColumns = [...DEFAULT_COLUMNS];
+    try {
+      const savedLocalCols = JSON.parse(localStorage.getItem('tam90_columns_v1') || 'null');
+      if (Array.isArray(savedLocalCols) && savedLocalCols.length > 0) {
+        editorialColumns = savedLocalCols;
+      }
+    } catch (e) {}
+
+    function renderColumnsSection() {
+      if (!editorialColumns.length) editorialColumns = [...DEFAULT_COLUMNS];
+      const latest = editorialColumns[0];
+      const hlEl = document.getElementById('colHeadline');
+      const prEl = document.getElementById('colPreview');
+      const dtEl = document.getElementById('colDateBadge');
+      const archEl = document.getElementById('colArchivePills');
+
+      if (hlEl) hlEl.textContent = latest.title;
+      if (prEl) prEl.textContent = latest.content;
+      if (dtEl) dtEl.textContent = latest.date || 'Bu Hafta';
+
+      if (archEl) {
+        if (editorialColumns.length > 1) {
+          archEl.style.display = 'flex';
+          archEl.innerHTML = `<span style="font-size:11px;color:var(--text-muted);font-weight:700;white-space:nowrap;">Önceki Yazılar:</span>` +
+            editorialColumns.slice(1, 6).map((c, idx) => `
+              <button type="button" onclick="openColumnReader(${idx + 1})" style="background:#141a29;border:1px solid var(--border);color:#cbd5e1;font-size:11px;font-weight:700;padding:4px 10px;border-radius:14px;cursor:pointer;white-space:nowrap;">
+                📄 ${c.date}: ${c.title.slice(0, 32)}${c.title.length > 32 ? '...' : ''}
+              </button>
+            `).join('');
+        } else {
+          archEl.style.display = 'none';
+        }
+      }
+    }
+
+    function openColumnReader(idx) {
+      const col = editorialColumns[idx] || editorialColumns[0];
+      if (!col) return;
+      openModal({
+        title: col.title,
+        summary: `✍️ YAZAR: ${col.author} (${col.role}) — ${col.date}\n\n${col.content}`,
+        image: 'templates/tam90_profile.png',
+        category: 'GENEL YAYIN YÖNETMENİ KÖŞE YAZISI',
+        timeAgo: col.date,
+        link: 'https://www.instagram.com/tamdoksanaresmi/'
+      });
+    }
+
+    function renderColumnAdminList() {
+      const listEl = document.getElementById('colAdminList');
+      if (!listEl) return;
+      listEl.innerHTML = editorialColumns.map((c, i) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#161a26;padding:8px 10px;border-radius:8px;font-size:12px;">
+          <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+            <strong style="color:var(--gold);">${c.date}:</strong> ${c.title}
+          </div>
+          ${editorialColumns.length > 1 ? `<button type="button" onclick="deleteColumn('${c.id}')" style="background:rgba(229,9,20,0.2);border:1px solid rgba(229,9,20,0.5);color:#ff6b6b;font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;cursor:pointer;flex-shrink:0;">Sil</button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function openColumnEditor() {
+      renderColumnAdminList();
+      const msgEl = document.getElementById('colStatusMsg');
+      if (msgEl) msgEl.style.display = 'none';
+      document.getElementById('columnEditorModal').classList.add('open');
+    }
+
+    async function publishNewColumn() {
+      const pin = document.getElementById('colPinInput').value.trim();
+      const title = document.getElementById('colTitleInput').value.trim();
+      const dateStr = document.getElementById('colDateInput').value.trim() || new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+      const content = document.getElementById('colContentInput').value.trim();
+      const msgEl = document.getElementById('colStatusMsg');
+
+      if (pin !== 'alperen10' && pin !== 'tam90') {
+        msgEl.style.display = 'block';
+        msgEl.style.color = '#f87171';
+        msgEl.textContent = '❌ Hatalı yönetici şifresi! (Şifre: alperen10)';
+        return;
+      }
+      if (!title || !content) {
+        msgEl.style.display = 'block';
+        msgEl.style.color = '#f87171';
+        msgEl.textContent = '⚠️ Lütfen köşe yazısı başlığını ve metnini girin.';
+        return;
+      }
+
+      const newCol = {
+        id: 'col_' + Date.now(),
+        title,
+        content,
+        date: dateStr,
+        author: 'Alperen Gündeş',
+        role: 'Genel Yayın Yönetmeni'
+      };
+
+      editorialColumns.unshift(newCol);
+      try { localStorage.setItem('tam90_columns_v1', JSON.stringify(editorialColumns)); } catch (e) {}
+      renderColumnsSection();
+      renderColumnAdminList();
+
+      const endpoints = ['/api/columns', 'api.php?type=columns', 'https://tam90-bot.onrender.com/api/columns'];
+      for (const ep of endpoints) {
+        try {
+          const res = await fetch(ep, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin, title, content, date: dateStr })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && Array.isArray(data.columns) && data.columns.length) {
+              editorialColumns = data.columns;
+              try { localStorage.setItem('tam90_columns_v1', JSON.stringify(editorialColumns)); } catch (e) {}
+              renderColumnsSection();
+              renderColumnAdminList();
+            }
+            break;
+          }
+        } catch (e) {}
+      }
+
+      document.getElementById('colTitleInput').value = '';
+      document.getElementById('colContentInput').value = '';
+      msgEl.style.display = 'block';
+      msgEl.style.color = '#68e325';
+      msgEl.textContent = '✅ Yeni köşe yazınız başarıyla yayınlandı!';
+    }
+
+    async function deleteColumn(colId) {
+      const pin = document.getElementById('colPinInput').value.trim();
+      const msgEl = document.getElementById('colStatusMsg');
+      if (pin !== 'alperen10' && pin !== 'tam90') {
+        msgEl.style.display = 'block';
+        msgEl.style.color = '#f87171';
+        msgEl.textContent = '❌ Yazı silmek için üstteki kutuya yönetici şifrenizi (alperen10) girin.';
+        return;
+      }
+      editorialColumns = editorialColumns.filter(c => c.id !== colId);
+      try { localStorage.setItem('tam90_columns_v1', JSON.stringify(editorialColumns)); } catch (e) {}
+      renderColumnsSection();
+      renderColumnAdminList();
+
+      const endpoints = ['/api/columns', 'api.php?type=columns', 'https://tam90-bot.onrender.com/api/columns'];
+      for (const ep of endpoints) {
+        try {
+          await fetch(ep, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin, action: 'delete', id: colId })
+          });
+        } catch (e) {}
+      }
+    }
+
+    async function fetchLiveColumns() {
+      const endpoints = ['/api/columns', 'api.php?type=columns', 'https://tam90-bot.onrender.com/api/columns'];
+      for (const ep of endpoints) {
+        try {
+          const res = await fetch(ep, { cache: 'no-store' });
+          if (res.ok) {
+            const cols = await res.json();
+            if (Array.isArray(cols) && cols.length > 0) {
+              editorialColumns = cols;
+              try { localStorage.setItem('tam90_columns_v1', JSON.stringify(editorialColumns)); } catch (e) {}
+              renderColumnsSection();
+              return;
+            }
+          }
+        } catch (e) {}
+      }
+    }
 
     function renderStandingsTable() {
       const tbody = document.getElementById('superLigTableBody');
@@ -2328,11 +2587,13 @@
       applyNewsPayload(window.__PRELOADED_NEWS);
     }
 
+    renderColumnsSection();
     renderStandingsTable();
     renderFixturesList();
     renderScorersTable();
     applyFilter();
     renderTickerAndTrending();
+    fetchLiveColumns();
     fetchLiveNews();
     fetchLiveStandings();
 
