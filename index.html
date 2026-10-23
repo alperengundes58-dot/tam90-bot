@@ -1836,9 +1836,9 @@
       }
     }
 
-    // Katmanlı Canlı Puan Durumu Entegrasyonu (Node.js -> PHP/cPanel)
+    // Katmanlı Canlı Puan Durumu Entegrasyonu (Node.js -> PHP/cPanel -> Bulut API)
     async function fetchLiveStandings() {
-      const endpoints = ['/api/standings', 'api.php?type=standings'];
+      const endpoints = ['/api/standings', 'api.php?type=standings', 'https://tam90-bot.onrender.com/api/standings'];
       for (const ep of endpoints) {
         try {
           const res = await fetch(ep, { cache: 'no-store' });
@@ -2040,7 +2040,7 @@
 
     // 3 Katmanlı Otopilot Canlı Haber Entegrasyonu (1: Node/Render API, 2: PHP/cPanel API, 3: Tarayıcı İçi Doğrudan RSS)
     async function fetchLiveNews() {
-      const backendEndpoints = ['/api/news', 'api.php?type=news'];
+      const backendEndpoints = ['/api/news', 'api.php?type=news', 'https://tam90-bot.onrender.com/api/news'];
       for (const ep of backendEndpoints) {
         try {
           const res = await fetch(ep, { cache: 'no-store' });
