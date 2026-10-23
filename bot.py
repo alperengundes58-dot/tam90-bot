@@ -389,15 +389,16 @@ def render_kaos_single_line(text, target_w, is_yellow_cracked, font_path):
                 b = 0
             f_draw.line([(0, y), (layer_w, y)], fill=(r, g, b))
 
-    # Alt satıra gerçekçi çatlak kaya dokusu (crackle_texture.png) uygula
+    # Alt satıra gerçekçi çatlak kaya dokusu (şeffaf crackle_texture.png) uygula
+    fill_rgba = fill_rgb.convert("RGBA")
     if is_yellow_cracked:
         crackle_path = Path(__file__).parent / "templates" / "crackle_texture.png"
         if crackle_path.exists():
-            crackle_img = Image.open(crackle_path).convert("RGB").resize((layer_w, layer_h), Image.Resampling.LANCZOS)
-            fill_rgb = ImageChops.multiply(fill_rgb, crackle_img)
+            crackle_img = Image.open(crackle_path).convert("RGBA").resize((layer_w, layer_h), Image.Resampling.LANCZOS)
+            fill_rgba = Image.alpha_composite(fill_rgba, crackle_img)
 
     face_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
-    face_layer.paste(fill_rgb.convert("RGBA"), (0, 0), mask)
+    face_layer.paste(fill_rgba, (0, 0), mask)
 
     # 3. 3D Siyah Blok Derinlik (Extrusion) + Kalın Keskin Kontur
     ext_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
@@ -417,10 +418,12 @@ def render_kaos_single_line(text, target_w, is_yellow_cracked, font_path):
 
     combined = Image.alpha_composite(ext_layer, face_layer)
 
-    # 4. Dikey Esnetme + İtalik Eğim (GALATASARAY'DA / KAOS İtalik Kesim)
-    scale_y = 1.18 if is_yellow_cracked else 1.24
+    # 4. Yatay Genişletme (Kısa kelimelerde KAOS gibi tok duruş) + Dikey Esnetme + İtalik Eğim
+    scale_x = min(1.45, (target_w * 0.85) / max(1, tw)) if (is_yellow_cracked and tw < target_w * 0.85) else 1.0
+    scale_y = 1.15 if is_yellow_cracked else 1.24
+    stretched_w = int(layer_w * scale_x)
     stretched_h = int(layer_h * scale_y)
-    stretched = combined.resize((layer_w, stretched_h), Image.Resampling.LANCZOS)
+    stretched = combined.resize((stretched_w, stretched_h), Image.Resampling.LANCZOS)
 
     shear = 0.14
     new_w = stretched.width + int(stretched.height * shear)
