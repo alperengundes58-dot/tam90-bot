@@ -1,39 +1,39 @@
-name: Tam Doksan 7/24 Kesintisiz Gönderi & Story Zamanlayıcı
+name: Tam Doksan 7/24 Kesintisiz Gönderi, Story & Anti-Sleep Zamanlayıcı
 
 on:
   schedule:
     # Gönderi Saatleri (UTC+3 -> UTC):
     # 10:00->07, 12:00->09, 15:00->12, 17:00->14, 20:00->17, 22:00->19, 00:00->21
-    # Story Saatleri (Öğlen 12 - Gece 12 arası 3 saatte bir):
-    # 12:00->09, 15:00->12, 18:00->15, 21:00->18, 00:00->21
     - cron: '0 7,9,12,14,15,17,18,19,21 * * *'
-    # Her 10 dakikada bir Render'ı uyanık tutma pingi
-    - cron: '*/10 * * * *'
+    # Her 5 dakikada bir Render'ı ve canlı spor verilerini uyanık tutma pingi
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
   post_and_keepalive:
     runs-on: ubuntu-latest
     steps:
-      - name: Render Sunucusunu Tetikle
+      - name: Render Sunucusunu ve Canlı Verileri Uyanık Tut
         run: |
           HOUR=$(date -u +%H)
           MIN=$(date -u +%M)
           echo "Mevcut UTC Saati: $HOUR:$MIN"
 
           # Gönderi saatleri (07, 09, 12, 14, 17, 19, 21 UTC -> 10, 12, 15, 17, 20, 22, 00 TR)
-          if [ "$MIN" -le 10 ] && [[ "$HOUR" =~ ^(07|09|12|14|17|19|21)$ ]]; then
+          if [ "$MIN" -le 7 ] && [[ "$HOUR" =~ ^(07|09|12|14|17|19|21)$ ]]; then
             echo "⚽️ GÖNDERİ SAATİ GELDİ! 4K Gönderi paylaşımı tetikleniyor..."
             curl -s -m 60 "https://tam90-bot.onrender.com/post-now" || true
           fi
 
           # Story saatleri: Öğlen 12'den Gece 12'ye 3 saatte bir (09, 12, 15, 18, 21 UTC -> 12, 15, 18, 21, 00 TR)
-          if [ "$MIN" -le 10 ] && [[ "$HOUR" =~ ^(09|12|15|18|21)$ ]]; then
+          if [ "$MIN" -le 7 ] && [[ "$HOUR" =~ ^(09|12|15|18|21)$ ]]; then
             echo "📱 STORY SAATİ GELDİ! 4K Story paylaşımı tetikleniyor..."
             sleep 15
             curl -s -m 60 "https://tam90-bot.onrender.com/story-now" || true
           fi
 
-          # Diğer dakikalarda uyanık tutma pingi
-          echo "⏱️ Render 7/24 Uyanık Tutma Pingi gönderiliyor..."
-          curl -s -m 30 "https://tam90-bot.onrender.com/" || true
+          # 7/24 Anti-Sleep & Canlı Veri Tazeleme Pingi
+          echo "⏱️ Render 7/24 Anti-Sleep ve Veri Önbelleği Pingi gönderiliyor..."
+          curl -s -m 25 "https://tam90-bot.onrender.com/" > /dev/null || true
+          curl -s -m 25 "https://tam90-bot.onrender.com/api/news" > /dev/null || true
+          curl -s -m 25 "https://tam90-bot.onrender.com/api/standings" > /dev/null || true
