@@ -449,13 +449,7 @@ def render_kaos_headline_block(line1, line2, font_path):
     block_w, block_h = 2160, 980
     block = Image.new("RGBA", (block_w, block_h), (0, 0, 0, 0))
 
-    # 1. Alt satırın arkasına sarı diyagonal fırça darbeleri (yellow_slashes.png)
-    slashes_path = Path(__file__).parent / "templates" / "yellow_slashes.png"
-    if slashes_path.exists():
-        slashes_img = Image.open(slashes_path).convert("RGBA").resize((2160, 620), Image.Resampling.LANCZOS)
-        block.paste(slashes_img, (0, 320), slashes_img)
-
-    # 2. Üst Satır (Metalik Beyaz) ve Alt Satır (Çatlak Kaya Sarı)
+    # Üst Satır (Metalik Beyaz) ve Alt Satır (Çatlak Kaya Sarı - Fırça darbesiz)
     line1_img = render_kaos_single_line(line1, 1840, False, font_path)
     line2_img = render_kaos_single_line(line2, 1840, True, font_path)
 
