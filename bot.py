@@ -174,10 +174,83 @@ def get_live_tff_standings():
         log(f"TFF canlı veri uyarısı: {e}")
     return PORTAL_STANDINGS_CACHE["data"] or {}
 
+COLUMNS_FILE = Path(__file__).parent / "columns.json"
+
+def load_saved_columns():
+    if COLUMNS_FILE.exists():
+        try:
+            return json.loads(COLUMNS_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return []
+
+def save_columns_list(cols):
+    try:
+        COLUMNS_FILE.write_text(json.dumps(cols, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+
 class HealthHandler(http.server.SimpleHTTPRequestHandler):
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == '/api/columns':
+            length = int(self.headers.get('Content-Length', 0))
+            raw_body = self.rfile.read(length).decode('utf-8') if length > 0 else '{}'
+            try:
+                payload = json.loads(raw_body)
+                pin = payload.get('pin', '')
+                if pin not in ['alperen10', 'tam90']:
+                    self.send_response(403)
+                    self.send_header("Content-type", "application/json; charset=utf-8")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": "Geçersiz yönetici şifresi"}, ensure_ascii=False).encode("utf-8"))
+                    return
+                cols = load_saved_columns()
+                if payload.get('action') == 'delete' and payload.get('id'):
+                    cols = [c for c in cols if c.get('id') != payload.get('id')]
+                elif payload.get('title') and payload.get('content'):
+                    cols.insert(0, {
+                        "id": f"col_{int(time.time()*1000)}",
+                        "title": str(payload.get('title')).strip(),
+                        "content": str(payload.get('content')).strip(),
+                        "date": payload.get('date') or time.strftime("%d.%m.%Y"),
+                        "author": "Alperen Gündeş",
+                        "role": "Genel Yayın Yönetmeni"
+                    })
+                save_columns_list(cols)
+                self.send_response(200)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": "ok", "columns": cols}, ensure_ascii=False).encode("utf-8"))
+            except Exception as e:
+                self.send_response(400)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+            return
+
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         params = urllib.parse.parse_qs(parsed.query)
+
+        if parsed.path == '/api/columns':
+            self.send_response(200)
+            self.send_header("Content-type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            cols = load_saved_columns()
+            self.wfile.write(json.dumps(cols, ensure_ascii=False).encode("utf-8"))
+            return
 
         if parsed.path == '/api/news':
             self.send_response(200)
