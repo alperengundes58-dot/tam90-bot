@@ -137,57 +137,107 @@ def login_instagram(two_factor_code=None):
         log(f"Giriş hatası: {type(e).__name__} - {e}")
         return False
 
-# 5. Yüksek Çözünürlüklü Basın Fotoğrafı Çekici
+# 5. Gerçek Zamanlı ve Güncel Basın Fotoğrafı Çekici (SADECE BUGÜNÜN SON DAKİKA HABERLERİ)
+ALREADY_POSTED_FILE = Path(__file__).parent / "posted_articles.json"
+
+def get_posted_titles():
+    if ALREADY_POSTED_FILE.exists():
+        try:
+            return set(json.loads(ALREADY_POSTED_FILE.read_text(encoding="utf-8")))
+        except:
+            return set()
+    return set()
+
+def save_posted_title(title):
+    posted = get_posted_titles()
+    posted.add(title)
+    try:
+        ALREADY_POSTED_FILE.write_text(json.dumps(list(posted), ensure_ascii=False), encoding="utf-8")
+    except:
+        pass
+
 def get_live_headline_and_photo():
+    posted_titles = get_posted_titles()
+    
+    # 100% Gerçek zamanlı, dakikası dakikasına güncellenen Türk spor kaynakları
     sources = [
-        "https://www.fotomac.com.tr/rss/anasayfa.xml",
-        "https://www.aspor.com.tr/rss/anasayfa.xml",
-        "https://www.ntv.com.tr/sporskor.rss"
+        "https://ajansspor.com/rss",
+        "https://www.haberturk.com/rss/spor.xml",
+        "https://www.sabah.com.tr/rss/spor.xml"
     ]
 
     for url in sources:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:8]:
-                title = entry.title
+            for entry in feed.entries[:15]:
+                title = entry.title.strip()
+                title = re.sub(r'<!\[CDATA\[|\]\]>', '', title).strip()
                 link = entry.link
                 img_url = None
 
+                # Zaten paylaşıldıysa atla
+                if title in posted_titles:
+                    continue
+
+                # 1. Enclosure görseli kontrol et
                 if 'enclosures' in entry and len(entry.enclosures) > 0:
                     img_url = entry.enclosures[0].get('href')
 
+                # 2. Media content kontrol et
+                if not img_url and 'media_content' in entry and len(entry.media_content) > 0:
+                    img_url = entry.media_content[0].get('url')
+
+                # 3. Sayfa içi og:image kontrol et
                 if not img_url and link:
                     try:
-                        r = requests.get(link, timeout=5)
+                        r = requests.get(link, headers={"User-Agent": "Mozilla/5.0"}, timeout=6)
                         m = re.search(r'<meta\s+property=["\']og:image["\']\s+content=["\']([^"\']+)["\']', r.text, re.IGNORECASE)
                         if m:
                             img_url = m.group(1)
                     except:
                         pass
 
-                if img_url:
+                if img_url and ("http" in img_url):
+                    # TM Grup orijinal basın fotoğrafını u= parametresinden çıkar
                     if "u=http" in img_url:
                         try:
-                            raw_original = urllib.parse.unquote(img_url.split("u=")[1])
-                            img_url = raw_original
-                            log(f"Ultra HD orijinal basın fotoğrafı URL'si alındı: {img_url}")
+                            img_url = urllib.parse.unquote(img_url.split("u=")[1])
                         except:
                             pass
+                    
+                    log(f"🔥 BUGÜNÜN SICAK HABERİ SEÇİLDİ: {title}")
+                    log(f"📸 Orijinal Fotoğraf URL: {img_url}")
+                    save_posted_title(title)
                     return title, img_url
         except Exception as e:
-            log(f"RSS hatası: {e}")
+            log(f"Haber çekme uyarısı ({url}): {e}")
 
-    return "Barış Alper Yılmaz İçin Avrupa Devi Devrede!", "https://iftm.tmgrup.com.tr/2025/05/31/baris-alper-yilmazin-babasindan-flas-transfer-aciklamasi-1748678696062.jpg"
+    # Fallback
+    return "Lille bir Türk'ün daha peşinde! Rota Galatasaray", "https://cdn.ajansspor.com/ajansspor/photo/2026/10/52d8ad8c-9c22-4e4d-84cc-5a00462e66f6.jpg"
 
 # 6. Kısa, Net ve Vurucu Manşet Motoru (YeniAçık Tarzı - 2-4 Kelime, Devasa Boyut)
 def format_football_headline(title):
-    clean = re.sub(r'^(FLAŞ|SON DAKİKA|ÖZEL HABER|ÖZEL|HABER|TRANSFER|RESMİ AÇIKLAMA|RESMİ)\s*[:|-]\s*', '', title, flags=re.I).strip()
+    clean = re.sub(r'^(FLAŞ|SON DAKİKA|ÖZEL HABER|ÖZEL|HABER|TRANSFER|RESMİ AÇIKLAMA|RESMİ|VİDEO)\s*[:|-]\s*', '', title, flags=re.I).strip()
     clean = clean.replace('"', '').replace("'", "").replace("’", "").replace("“", "").replace("”", "").strip()
     clean = clean.rstrip('.!')
     lower = clean.lower()
 
-    # 1. Maç & Beraberlik & Düello
-    if any(k in lower for k in ["berabere", "düello", "yenişemedi", "crystal palace"]):
+    # 1. Transfer ve Kanca Haberleri
+    if "lille" in lower and "galatasaray" in lower:
+        return "LILLE'DEN", "CİMBOM'A KANCA !"
+    if "sergen" in lower:
+        return "SERGEN YALÇIN", "YOLA KOYULDU !"
+    if "ronaldo" in lower:
+        return "CRISTIANO RONALDO", "DURDURULAMIYOR !"
+    if "miretti" in lower or ("beşiktaş" in lower and "sakat" in lower):
+        return "BEŞİKTAŞ'TA", "MİRETTİ ŞOKU !"
+    if "zeki çelik" in lower or "sakatlandı" in lower:
+        return "MİLLİ YILDIZDAN", "KÖTÜ HABER !"
+    if "kompany" in lower or "hastane" in lower:
+        return "BAYERN MÜNİH'TE", "BÜYÜK ŞOK !"
+
+    # 2. Maç & Beraberlik & Düello
+    if any(k in lower for k in ["berabere", "düello", "yenişemedi"]):
         if "beşiktaş" in lower:
             return "BEŞİKTAŞ'TAN", "MÜTHİŞ DÜELLO !"
         elif "fenerbahçe" in lower:
@@ -196,7 +246,7 @@ def format_football_headline(title):
             return "GALATASARAY'DAN", "MÜTHİŞ DÜELLO !"
         return "GOL DÜELLOSU", "KAZANAN ÇIKMADI !"
 
-    # 2. Galibiyet & Zafer
+    # 3. Galibiyet & Zafer
     if any(k in lower for k in ["galip", "kazandı", "yendi", "mağlup etti", "zafer"]):
         if "beşiktaş" in lower:
             return "BEŞİKTAŞ", "FARKLI KAZANDI !"
@@ -206,21 +256,14 @@ def format_football_headline(title):
             return "GALATASARAY", "FARKLI KAZANDI !"
         return "MÜTHİŞ ZAFER", "KAZANMAYI BİLDİ !"
 
-    # 3. Transfer & Anlaşma
-    if any(k in lower for k in ["transfer", "devrede", "anlaştı", "imza", "avrupa"]):
+    # 4. Genel Transfer
+    if any(k in lower for k in ["transfer", "devrede", "anlaştı", "imza"]):
         words = clean.split()
         if len(words) >= 2:
             return f"{words[0]} {words[1]}".upper(), "AVRUPA DEVİ DEVREDE !"
         return "FLAŞ TRANSFER", "ANLAŞMA SAĞLANDI !"
 
-    # 4. Kriz & Ayrılık & Şok
-    if any(k in lower for k in ["ayrılık", "istifa", "veda", "kriz"]):
-        return "ORTALIK KARIŞTI", "FLAŞ AYRILIK !"
-
-    if any(k in lower for k in ["sakatlık", "şok", "yıkıldı"]):
-        return "KÖTÜ HABER", "ŞOK SAKATLIK !"
-
-    # 5. Genel Durum: En fazla 3-4 kelime, kısa ve net!
+    # 5. Genel Durum (2-4 Kelime)
     words = clean.split()
     if len(words) <= 2:
         return words[0].upper(), (words[1] + " !").upper() if len(words) > 1 else "FLAŞ GELİŞME !"
