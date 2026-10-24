@@ -72,24 +72,24 @@ def get_portal_news_feed():
         return PORTAL_NEWS_CACHE["items"]
 
     sources = [
+        "https://www.sabah.com.tr/rss/futbol.xml",
         "https://www.haberturk.com/rss/spor.xml",
         "https://ajansspor.com/rss",
         "https://www.sabah.com.tr/rss/spor.xml"
     ]
-    skip_keywords = ["voleybol", "hentbol", "güreş", "atletizm", "boks", "tenis"]
     seen = set()
     items = []
 
     for url in sources:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:20]:
+            for entry in feed.entries[:25]:
                 title = clean_html(entry.get("title", ""))
                 summary = clean_html(entry.get("summary", "") or entry.get("description", ""))
                 link = entry.get("link", "")
                 if not title or title in seen:
                     continue
-                if any(sk in title.lower() for sk in skip_keywords):
+                if not is_strictly_football(title, summary, link):
                     continue
 
                 img_url = None
@@ -125,132 +125,10 @@ def get_portal_news_feed():
         PORTAL_NEWS_CACHE["items"] = items
     return PORTAL_NEWS_CACHE["items"]
 
-PORTAL_STANDINGS_CACHE = {"ts": 0, "data": None}
-
-def get_live_tff_standings():
-    now = time.time()
-    if PORTAL_STANDINGS_CACHE["data"] and (now - PORTAL_STANDINGS_CACHE["ts"] < 120):
-        return PORTAL_STANDINGS_CACHE["data"]
-    try:
-        r = requests.get("https://www.tff.org/default.aspx?pageID=198", headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
-        raw = r.content.decode("latin1", errors="ignore")
-        replacements = {
-            "&#252;": "ü", "&#220;": "Ü", "&#246;": "ö", "&#214;": "Ö",
-            "&#231;": "ç", "&#199;": "Ç", "&nbsp;": " ",
-            "Ý": "İ", "Þ": "Ş", "Ð": "Ğ", "ý": "ı", "þ": "ş", "ð": "ğ"
-        }
-        for k, v in replacements.items():
-            raw = raw.replace(k, v)
-        text = re.sub(r"<script[\s\S]*?</script>", " ", raw, flags=re.I)
-        text = re.sub(r"<style[\s\S]*?</style>", " ", text, flags=re.I)
-        text = re.sub(r"<[^>]+>", " ", text)
-        text = re.sub(r"\s+", " ", text)
-
-        standings = []
-        m_block = re.search(r"O\s+G\s+B\s+M\s+A\s+Y\s+AV\s+P\s+(.*?)Not:\s+Futbol", text)
-        if m_block:
-            for m in re.finditer(r"(\d+)\.([A-ZÇĞİÖŞÜ.\s-]+?)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(-?\d+)\s+(\d+)", m_block.group(1)):
-                tname = re.sub(r"\s*A\.Ş\.|\s*FUTBOL KULÜBÜ", "", m.group(2)).strip()
-                standings.append({
-                    "rank": int(m.group(1)),
-                    "team": tname.title() if len(tname) > 4 else tname,
-                    "played": int(m.group(3)),
-                    "won": int(m.group(4)),
-                    "drawn": int(m.group(5)),
-                    "lost": int(m.group(6)),
-                    "gf": int(m.group(7)),
-                    "ga": int(m.group(8)),
-                    "gd": int(m.group(9)),
-                    "points": int(m.group(10))
-                })
-        if len(standings) >= 15:
-            PORTAL_STANDINGS_CACHE["ts"] = now
-            PORTAL_STANDINGS_CACHE["data"] = {
-                "season": "Trendyol Süper Lig 2026-2027",
-                "updatedAt": time.strftime("%H:%M"),
-                "standings": standings
-            }
-    except Exception as e:
-        log(f"TFF canlı veri uyarısı: {e}")
-    return PORTAL_STANDINGS_CACHE["data"] or {}
-
-COLUMNS_FILE = Path(__file__).parent / "columns.json"
-
-def load_saved_columns():
-    if COLUMNS_FILE.exists():
-        try:
-            return json.loads(COLUMNS_FILE.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return []
-
-def save_columns_list(cols):
-    try:
-        COLUMNS_FILE.write_text(json.dumps(cols, ensure_ascii=False, indent=2), encoding="utf-8")
-    except Exception:
-        pass
-
 class HealthHandler(http.server.SimpleHTTPRequestHandler):
-    def do_OPTIONS(self):
-        self.send_response(204)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.end_headers()
-
-    def do_POST(self):
-        parsed = urllib.parse.urlparse(self.path)
-        if parsed.path == '/api/columns':
-            length = int(self.headers.get('Content-Length', 0))
-            raw_body = self.rfile.read(length).decode('utf-8') if length > 0 else '{}'
-            try:
-                payload = json.loads(raw_body)
-                pin = payload.get('pin', '')
-                if pin not in ['alperen10', 'tam90']:
-                    self.send_response(403)
-                    self.send_header("Content-type", "application/json; charset=utf-8")
-                    self.send_header("Access-Control-Allow-Origin", "*")
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"error": "Geçersiz yönetici şifresi"}, ensure_ascii=False).encode("utf-8"))
-                    return
-                cols = load_saved_columns()
-                if payload.get('action') == 'delete' and payload.get('id'):
-                    cols = [c for c in cols if c.get('id') != payload.get('id')]
-                elif payload.get('title') and payload.get('content'):
-                    cols.insert(0, {
-                        "id": f"col_{int(time.time()*1000)}",
-                        "title": str(payload.get('title')).strip(),
-                        "content": str(payload.get('content')).strip(),
-                        "date": payload.get('date') or time.strftime("%d.%m.%Y"),
-                        "author": "Alperen Gündeş",
-                        "role": "Genel Yayın Yönetmeni"
-                    })
-                save_columns_list(cols)
-                self.send_response(200)
-                self.send_header("Content-type", "application/json; charset=utf-8")
-                self.send_header("Access-Control-Allow-Origin", "*")
-                self.end_headers()
-                self.wfile.write(json.dumps({"status": "ok", "columns": cols}, ensure_ascii=False).encode("utf-8"))
-            except Exception as e:
-                self.send_response(400)
-                self.send_header("Content-type", "application/json; charset=utf-8")
-                self.send_header("Access-Control-Allow-Origin", "*")
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
-            return
-
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         params = urllib.parse.parse_qs(parsed.query)
-
-        if parsed.path == '/api/columns':
-            self.send_response(200)
-            self.send_header("Content-type", "application/json; charset=utf-8")
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.end_headers()
-            cols = load_saved_columns()
-            self.wfile.write(json.dumps(cols, ensure_ascii=False).encode("utf-8"))
-            return
 
         if parsed.path == '/api/news':
             self.send_response(200)
@@ -261,25 +139,7 @@ class HealthHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(news, ensure_ascii=False).encode("utf-8"))
             return
 
-        if parsed.path == '/api/standings':
-            self.send_response(200)
-            self.send_header("Content-type", "application/json; charset=utf-8")
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.end_headers()
-            st = get_live_tff_standings()
-            self.wfile.write(json.dumps(st, ensure_ascii=False).encode("utf-8"))
-            return
-
-        if parsed.path in ['/manifest.json', 'manifest.json']:
-            m_file = Path(__file__).parent / "manifest.json"
-            if m_file.exists():
-                self.send_response(200)
-                self.send_header("Content-type", "application/manifest+json; charset=utf-8")
-                self.end_headers()
-                self.wfile.write(m_file.read_bytes())
-                return
-
-        if parsed.path in ['/templates/tam90_profile.png', '/templates/tam90_logo.png', '/templates/sponsors_footer.png']:
+        if parsed.path in ['/templates/tam90_logo.png', '/templates/sponsors_footer.png']:
             asset_file = Path(__file__).parent / parsed.path.lstrip('/')
             if asset_file.exists():
                 self.send_response(200)
@@ -405,23 +265,65 @@ def clean_html(raw_html):
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
+# %100 SADECE FUTBOL FİLTRESİ (Basketbol, Voleybol, Tenis, F1, Boks vb. Kesinlikle Engellenir)
+NON_FOOTBALL_KEYWORDS = [
+    "basketbol", "euroleague", "nba", "anadolu efes", "efes", "fenerbahçe beko", "beko",
+    "beşiktaş fibabanka", "galatasaray basketbol", "bahçeşehir koleji", "karşıyaka",
+    "tofaş", "türk telekom", "alperen şengün", "ergin ataman", "panathinaikos",
+    "olympiakos", "parkede", "potada", "ribaunt", "üçlük", "smaç", "12 dev adam",
+    "bsl", "tbf", "fiba", "periyot", "çeyrek",
+    "voleybol", "sultanlar ligi", "efeler ligi", "vakıfbank", "eczacıbaşı", "medicana",
+    "daikin", "filenin sultanları", "filenin efeleri", "melissa vargas", "zehra güneş",
+    "ebrar karakurt", "hande baladın", "set ", "sette", "tie-break",
+    "tenis", "wimbledon", "roland garros", "djokovic", "alcaraz", "nadal", "sinner", "zeynep sönmez",
+    "formula 1", "f1", "verstappen", "hamilton", "leclerc", "ferrari", "mclaren", "red bull racing",
+    "motogp", "toprak razgatlıoğlu", "superbike", "ralli",
+    "boks", "ufc", "mma", "güreş", "halter", "atletizm", "yüzme", "okçuluk", "mete gazoz",
+    "cimnastik", "hentbol", "bilardo", "satranç", "espor", "valorant", "counter-strike",
+    "golf", "bisiklet", "snooker", "inşaat", "stadyumu"
+]
+
+FOOTBALL_POSITIVE_KEYWORDS = [
+    "futbol", "süper lig", "galatasaray", "fenerbahçe", "beşiktaş", "trabzonspor",
+    "başakşehir", "samsunspor", "göztepe", "eyüpspor", "kasımpaşa", "sivasspor",
+    "antalyaspor", "alanyaspor", "konyaspor", "rizespor", "gaziantep", "hatayspor",
+    "kayserispor", "bodrum", "adana demirspor", "milli takım", "montella",
+    "arda güler", "kenan yıldız", "hakan çalhanoğlu", "kerem aktürkoğlu", "orkun kökçü",
+    "ferdi kadıoğlu", "barış alper", "icardi", "osimhen", "mourinho", "okan buruk",
+    "sergen yalçın", "şenol güneş", "fatih terim", "ronaldo", "messi", "mbappe", "haaland",
+    "real madrid", "barcelona", "bayern", "münih", "manchester", "liverpool", "arsenal",
+    "chelsea", "juventus", "inter", "milan", "psg", "lille", "benfica", "porto", "atletico",
+    "şampiyonlar ligi", "avrupa ligi", "konferans ligi", "uefa", "fifa", "tff", "pfdk",
+    "mhk", "derbi", "transfer", "bonservis", "forvet", "golcü", "kaleci", "stoper",
+    "orta saha", "teknik direktör", "kırmızı kart", "penaltı", "ofsayt", "var ",
+    "gol", "maç", "puan", "lig", "kupa", "stat", "taraftar", "idman", "antrenman"
+]
+
+def is_strictly_football(title, summary="", link=""):
+    combined = f"{title} {summary} {link}".lower()
+    # 1. Başka spor dalı kelimesi geçiyorsa kesinlikle reddet
+    if any(bad in combined for bad in NON_FOOTBALL_KEYWORDS):
+        return False
+    # 2. En az bir futbol terimi/takımı/oyuncusu geçmeli
+    if not any(good in combined for good in FOOTBALL_POSITIVE_KEYWORDS):
+        return False
+    return True
+
 def get_live_headline_and_photo():
     posted_titles = get_posted_titles()
 
-    # Sadece anlık güncellenen Full HD Türk spor kaynakları
+    # Sadece anlık güncellenen Full HD Türk futbol ve spor kaynakları
     sources = [
+        "https://www.sabah.com.tr/rss/futbol.xml",
         "https://www.haberturk.com/rss/spor.xml",
         "https://ajansspor.com/rss",
         "https://www.sabah.com.tr/rss/spor.xml"
     ]
 
-    # Düşük etkileşimli/amatör/tesis haberlerini filtrele
-    skip_keywords = ["inşaat", "stadyumu", "voleybol", "hentbol", "güreş", "atletizm", "boks", "tenis"]
-
     for url in sources:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:18]:
+            for entry in feed.entries[:25]:
                 title = clean_html(entry.get("title", ""))
                 summary = clean_html(entry.get("summary", "") or entry.get("description", ""))
                 link = entry.get("link", "")
@@ -430,8 +332,11 @@ def get_live_headline_and_photo():
                 if not title or title in posted_titles:
                     continue
 
-                lower_t = title.lower()
-                if any(sk in lower_t for sk in skip_keywords):
+                # Yarım bırakılmış clickbait başlıkları (... ile biten) kesinlikle atla
+                if title.endswith('...') or title.endswith('…') or title.endswith('..'):
+                    continue
+
+                if not is_strictly_football(title, summary, link):
                     continue
 
                 # 1. Enclosure görseli
@@ -476,10 +381,20 @@ def get_live_headline_and_photo():
 def generate_smart_caption(title, summary):
     lower = f"{title} {summary}".lower()
 
-    # Özeti temizle ve başlıkla birebir aynıysa tekrarı önle
+    # Özeti temizle ve yarım kalan (...) cümleleri son tam cümlenin noktasına kadar toparla
     body_text = summary.strip() if summary and len(summary.strip()) > 25 else ""
     if body_text.lower() == title.lower():
         body_text = ""
+
+    if body_text:
+        # Eğer özet ... veya … ile bitiyorsa, yarım kalan parçayı temizleyip son tam cümlenin noktasıyla bitir
+        if body_text.endswith("...") or body_text.endswith("…") or "..." in body_text[-8:]:
+            body_text = re.sub(r'[.]{2,}|…+$', '', body_text).strip()
+            last_punc = max(body_text.rfind("."), body_text.rfind("!"), body_text.rfind("?"))
+            if last_punc > 35:
+                body_text = body_text[:last_punc + 1].strip()
+            else:
+                body_text = body_text + "."
 
     # Konuya özel soru ve emoji seçimi (ASLA alakasız "Sizce bu karar doğru mu?" yazmaz!)
     if any(k in lower for k in ["hastane", "sakat", "ameliyat", "tedavi", "kırık", "şok", "sağlık", "geçmiş olsun"]):
@@ -508,60 +423,71 @@ def generate_smart_caption(title, summary):
         )
     return caption
 
-# 7. Kısa, Net ve Vurucu 2 Satırlık Manşet Motoru (YeniAçık & Tam90 Tarzı)
+# 7. Kısa, Net ve Vurucu 2 Satırlık Manşet Motoru (ASLA KELİME KESİLMEZ - CÜMLE TAM BİTER)
 def tr_upper(text):
     return text.replace("i", "İ").replace("ı", "I").replace("ğ", "Ğ").replace("ü", "Ü").replace("ş", "Ş").replace("ö", "Ö").replace("ç", "Ç").upper()
 
 def format_football_headline(title):
     clean = re.sub(r'^(FLAŞ|SON DAKİKA|ÖZEL HABER|ÖZEL|HABER|TRANSFER|RESMİ AÇIKLAMA|RESMİ|VİDEO)\s*[:|-]\s*', '', title, flags=re.I).strip()
-    clean = clean.replace('"', '').replace("’", "'").replace("“", "").replace("”", "").strip()
-    clean = clean.rstrip('.!')
+    clean = clean.replace('"', '').replace("“", "").replace("”", "").replace("‘", "'").replace("’", "'").strip()
+    clean = re.sub(r'[.]{2,}|…+$', '', clean).strip()
+    clean = clean.rstrip('.')
     lower = clean.lower()
 
+    # 1. Özel ve bilinen haber kalıpları
     if "ronaldo" in lower and "982" in lower:
         return "CRISTIANO RONALDO", "982. GOLÜNÜ ATTI !"
     if "ronaldo" in lower:
         return "CRISTIANO RONALDO", "DURDURULAMIYOR !"
     if "lille" in lower and "galatasaray" in lower:
         return "LILLE'DEN", "CİMBOM'A KANCA !"
-    if "sergen" in lower:
-        return "SERGEN YALÇIN", "HAREKETE GEÇTİ !"
+    if "sergen" in lower and "yol" in lower:
+        return "SERGEN YALÇIN", "YOLA KOYULDU !"
     if "miretti" in lower or ("beşiktaş" in lower and "sakat" in lower):
-        return "BEŞİKTAŞ'TA", "SAKATlık ŞOKU !"
+        return "BEŞİKTAŞ'TA", "SAKATLIK ŞOKU !"
     if "kompany" in lower or "hastane" in lower:
         return "VINCENT KOMPANY", "HASTANEYE KALDIRILDI !"
-    if "mourinho" in lower:
-        return "JOSE MOURINHO", "GÜNDEMİ SARSTI !"
-    if "osimhen" in lower:
-        return "VICTOR OSIMHEN", "KARARINI VERDİ !"
-    if "icardi" in lower:
-        return "MAURO ICARDI", "GERİ DÖNÜYOR !"
 
-    if any(k in lower for k in ["berabere", "düello", "yenişemedi"]):
-        if "beşiktaş" in lower:
-            return "BEŞİKTAŞ'TAN", "MÜTHİŞ DÜELLO !"
-        elif "fenerbahçe" in lower:
-            return "FENERBAHÇE'DEN", "MÜTHİŞ DÜELLO !"
-        elif "galatasaray" in lower:
-            return "GALATASARAY'DAN", "MÜTHİŞ DÜELLO !"
-        return "GOL DÜELLOSU", "KAZANAN ÇIKMADI !"
+    # 2. İki nokta üst üste varsa (Konuşmacı : Söylenen Cümlenin Tamamı)
+    if ":" in clean:
+        parts = [p.strip() for p in clean.split(":") if p.strip()]
+        if len(parts) >= 2:
+            l1 = tr_upper(parts[0])
+            l2 = tr_upper(" ".join(parts[1:]))
+            if not l2.endswith("!") and not l2.endswith("?"):
+                l2 += " !"
+            return l1, l2
 
-    if any(k in lower for k in ["galip", "kazandı", "yendi", "mağlup etti", "zafer"]):
-        if "beşiktaş" in lower:
-            return "BEŞİKTAŞ", "ZAFERE ULAŞTI !"
-        elif "fenerbahçe" in lower:
-            return "FENERBAHÇE", "ZAFERE ULAŞTI !"
-        elif "galatasaray" in lower:
-            return "GALATASARAY", "ZAFERE ULAŞTI !"
-        return "KRİTİK MAÇTA", "DEV ZAFER !"
+    # 3. Ünlem veya Soru işareti ile ayrılmış 2 cümle varsa
+    punc_match = re.match(r'^(.+?[!?])\s+(.+)$', clean)
+    if punc_match:
+        l1 = tr_upper(re.sub(r'[!?]', '', punc_match.group(1)).strip())
+        l2 = tr_upper(punc_match.group(2).strip())
+        if not l2.endswith("!") and not l2.endswith("?"):
+            l2 += " !"
+        return l1, l2
 
+    # 4. Tire ile ayrılmış 2 parça varsa
+    if " - " in clean:
+        parts = [p.strip() for p in clean.split(" - ") if p.strip()]
+        if len(parts) >= 2:
+            l1 = tr_upper(parts[0])
+            l2 = tr_upper(" ".join(parts[1:]))
+            if not l2.endswith("!") and not l2.endswith("?"):
+                l2 += " !"
+            return l1, l2
+
+    # 5. Tek tam cümle: Cümlenin HİÇBİR KELİMESİ ATILMAZ! Ortadan iki satıra tam bölünür
     words = [tr_upper(w) for w in clean.split() if w]
     if len(words) <= 2:
-        return words[0], (words[1] + " !") if len(words) > 1 else "FLAŞ GELİŞME !"
-    elif len(words) == 3:
-        return f"{words[0]} {words[1]}", f"{words[2]} !"
-    else:
-        return f"{words[0]} {words[1]}", f"{words[2]} {words[3]} !"
+        return words[0] if words else "FLAŞ", (words[1] + " !") if len(words) > 1 else "GELİŞME !"
+
+    mid = (len(words) + 1) // 2
+    l1 = " ".join(words[:mid])
+    l2 = " ".join(words[mid:])
+    if not l2.endswith("!") and not l2.endswith("?"):
+        l2 += " !"
+    return l1, l2
 
 # 8. Ultra 4K (2160x2700 Supersampled) Tam Doksan Tasarım Motoru ("GALATASARAY'DA / KAOS" İtalik & Çatlak Kaya Stili)
 def render_kaos_single_line(text, target_w, is_yellow_cracked, font_path):
@@ -570,8 +496,13 @@ def render_kaos_single_line(text, target_w, is_yellow_cracked, font_path):
     dummy = Image.new("RGBA", (10, 10))
     d_draw = ImageDraw.Draw(dummy)
 
-    while base_size > 95:
+    # Yazı hedeflenen genişliğe tam sığana kadar dinamik küçült (asla yarım kalma veya kesilme olmaz)
+    while base_size > 55:
         font = ImageFont.truetype(font_path, base_size)
+        bbox = d_draw.textbbox((0, 0), text, font=font)
+        if (bbox[2] - bbox[0]) <= target_w:
+            break
+        base_size -= 3
         bbox = d_draw.textbbox((0, 0), text, font=font)
         if (bbox[2] - bbox[0]) <= target_w:
             break
@@ -988,29 +919,12 @@ def execute_story():
     else:
         log("Giriş yapılamadığı için Story yüklenemedi.")
 
-class ThreadedHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    allow_reuse_address = True
-    daemon_threads = True
-
-def keep_alive_and_prewarm_daemon():
-    public_url = os.environ.get("RENDER_EXTERNAL_URL", "https://tam90-bot.onrender.com")
-    while True:
-        try:
-            get_portal_news_feed()
-            get_live_tff_standings()
-            requests.get(f"{public_url}/api/news", headers={"User-Agent": "Tam90-KeepAlive/1.0"}, timeout=10)
-            requests.get(f"{public_url}/api/standings", headers={"User-Agent": "Tam90-KeepAlive/1.0"}, timeout=10)
-        except Exception:
-            pass
-        time.sleep(180)  # Her 3 dakikada bir hem önbelleği tazele hem de Render'ı uyanık tut
-
 # 11. 7/24 Kesintisiz Döngü
 # Gönderi Saatleri: 10:00, 12:00, 15:00, 17:00, 20:00, 22:00, 00:00
 # Story Saatleri (Öğlen 12'den Gece 12'ye 3 Saatte Bir): 12:00, 15:00, 18:00, 21:00, 00:00
 if __name__ == "__main__":
-    threading.Thread(target=lambda: ThreadedHTTPServer(("", PORT), HealthHandler).serve_forever(), daemon=True).start()
-    threading.Thread(target=keep_alive_and_prewarm_daemon, daemon=True).start()
-    log(f"7/24 Çoklu İstek Destekli Web Sunucusu ve Anti-Sleep Motoru {PORT} portunda aktif...")
+    threading.Thread(target=lambda: socketserver.TCPServer(("", PORT), HealthHandler).serve_forever(), daemon=True).start()
+    log(f"Web sunucusu {PORT} portunda dinliyor...")
 
     TARGET_HOURS = [10, 12, 15, 17, 20, 22, 0]
     STORY_HOURS = [12, 15, 18, 21, 0]
